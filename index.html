@@ -3,199 +3,363 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>⚡ AI Prompt 終端母體寶庫</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<title>⚡ 終極提示詞寶庫</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    /* Matrix 核心配色 */
-    --bg-main: #05070B;       /* 純粹暗黑底色 */
-    --bg-card: #0D1117;       /* 終端機卡片黑 */
-    --bg-input: #0A0D14;      /* 輸入框暗黑 */
-    --border-color: #1A241E;  /* 帶有微綠的暗色邊框 */
+    /* 核心闇黑科技配色 */
+    --bg-main: #020204;       /* 極限深黑 */
+    --bg-card: #070a0e;       /* 終端卡片黑，帶極深藍綠調 */
+    --bg-input: #040609;      /* 輸入框暗黑 */
+    --border-color: #0f241a;  /* 暗綠科技感邊框 */
     
-    /* 經典駭客綠系列 */
-    --matrix-green: #00FF66;       /* 高亮螢光綠 */
-    --matrix-green-dim: #00CC52;   /* 次要綠 */
-    --matrix-green-glow: #003314;  /* 螢光微光 */
+    /* 經典螢光駭客綠與霓虹色系 */
+    --matrix-green: #00ff66;       /* 主色：螢光綠 */
+    --matrix-green-dim: #00cc52;   /* 次要：暗綠 */
+    --matrix-green-glow: rgba(0, 255, 102, 0.15); /* 綠光暈 */
+    --matrix-cyan: #00f0ff;        /* 科技青 */
+    --matrix-red: #ff3b30;         /* 警告紅 */
     
-    --text-primary: #E2E8F0;
-    --text-secondary: #8492A6;
-    --text-muted: #4A5768;
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --text-muted: #475569;
   }
 
   body {
-    font-family: 'Noto Sans TC', 'Plus Jakarta Sans', sans-serif;
+    font-family: 'Fira Code', 'Noto Sans TC', 'Plus Jakarta Sans', sans-serif;
     background-color: var(--bg-main);
     color: var(--text-primary);
     min-height: 100vh;
-    /* 模擬母體的微弱綠色數位射線感 */
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* 科技掃描線效果 */
+  body::before {
+    content: " ";
+    display: block;
+    position: fixed;
+    top: 0; left: 0; bottom: 0; right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    z-index: 9999;
+    background-size: 100% 4px, 6px 100%;
+    pointer-events: none;
+    opacity: 0.4;
+  }
+
+  /* Matrix 數位雨 Canvas 背景 */
+  #matrix-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0.12; /* 微弱動態感，不干擾文字閱讀 */
+    pointer-events: none;
+  }
+
+  /* 網格網線背景 */
+  .grid-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-size: 40px 40px;
     background-image: 
-      radial-gradient(at 50% 0%, rgba(0, 255, 102, 0.03) 0px, transparent 60%),
-      radial-gradient(at 0% 100%, rgba(0, 255, 102, 0.01) 0px, transparent 40%);
+      linear-gradient(to right, rgba(0, 255, 102, 0.02) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 255, 102, 0.02) 1px, transparent 1px);
+    z-index: -1;
+    pointer-events: none;
   }
 
   .top-bar {
-    padding: 60px 24px 0;
+    padding: 70px 24px 20px;
     text-align: center;
+    position: relative;
+    max-width: 900px;
+    margin: 0 auto;
   }
 
+  /* 終端機裝飾角落 */
+  .decor-corner {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--matrix-green-dim);
+    pointer-events: none;
+    opacity: 0.5;
+  }
+  .corner-tl { top: 20px; left: 24px; border-right: none; border-bottom: none; }
+  .corner-tr { top: 20px; right: 24px; border-left: none; border-bottom: none; }
+  .corner-bl { bottom: 20px; left: 24px; border-right: none; border-top: none; }
+  .corner-br { bottom: 20px; right: 24px; border-left: none; border-top: none; }
+
   .site-title {
-    font-family: 'Fira Code', 'Noto Sans TC', monospace;
-    font-size: 2.2rem;
+    font-size: 2.4rem;
     font-weight: 700;
-    letter-spacing: -1px;
-    margin-bottom: 12px;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
     color: var(--matrix-green);
-    text-shadow: 0 0 12px rgba(0, 255, 102, 0.4);
+    text-shadow: 0 0 15px rgba(0, 255, 102, 0.6);
+    display: inline-block;
+    position: relative;
+  }
+
+  .site-title::after {
+    content: '_';
+    animation: blink 0.8s infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  .site-subtitle {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
   }
 
   .sheet-link {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    font-size: 13px;
+    gap: 8px;
+    font-size: 12px;
     color: var(--text-secondary);
     text-decoration: none;
-    margin-bottom: 32px;
-    transition: color 0.2s;
+    margin-bottom: 35px;
+    transition: all 0.2s;
+    background: rgba(0, 255, 102, 0.03);
+    padding: 6px 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
   }
   .sheet-link:hover { 
     color: var(--matrix-green);
-    text-shadow: 0 0 8px rgba(0, 255, 102, 0.3);
+    border-color: var(--matrix-green);
+    box-shadow: 0 0 10px rgba(0, 255, 102, 0.2);
+    background: rgba(0, 255, 102, 0.08);
   }
   .sheet-link svg { width: 14px; height: 14px; }
 
-  .search-wrap {
-    max-width: 560px;
-    margin: 0 auto 32px;
+  /* 搜尋區塊外框優化 */
+  .search-container {
+    max-width: 580px;
+    margin: 0 auto 36px;
     position: relative;
   }
 
-  .search-wrap svg {
+  .search-wrap {
+    position: relative;
+    border: 1.5px solid var(--border-color);
+    background: var(--bg-input);
+    border-radius: 4px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .search-wrap::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; width: 100%; height: 1px;
+    background: var(--matrix-green);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+  }
+
+  .search-wrap:focus-within {
+    border-color: var(--matrix-green);
+    box-shadow: 0 0 20px rgba(0, 255, 102, 0.15);
+  }
+
+  .search-wrap:focus-within::before {
+    transform: scaleX(1);
+  }
+
+  .search-wrap svg.search-icon {
     position: absolute;
     left: 18px;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--text-muted);
+    color: var(--matrix-green-dim);
     width: 18px;
     height: 18px;
+    pointer-events: none;
   }
 
   #searchInput {
     width: 100%;
-    padding: 14px 16px 14px 48px;
+    padding: 16px 48px 16px 48px;
     font-size: 15px;
     font-family: inherit;
-    border: 1.5px solid var(--border-color);
-    border-radius: 8px; /* 改為更有科技棱角感的微圓角 */
-    background: var(--bg-input);
+    border: none;
+    background: transparent;
     color: var(--matrix-green);
     outline: none;
-    transition: all 0.2s;
-  }
-  #searchInput:focus {
-    border-color: var(--matrix-green);
-    box-shadow: 0 0 15px rgba(0, 255, 102, 0.15);
   }
   #searchInput::placeholder { color: var(--text-muted); }
 
+  /* 清除按鈕 */
+  .clear-btn {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+  }
+  .clear-btn:hover { color: var(--matrix-green); }
+  .clear-btn svg { width: 18px; height: 18px; }
+
+  /* 橫向滾動分類列：微調科技刻度感 */
+  .category-outer {
+    max-width: 960px;
+    margin: 0 auto 40px;
+    padding: 0 24px;
+    position: relative;
+  }
+  
   .category-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
     justify-content: center;
-    padding: 0 24px 40px;
-    max-width: 900px;
-    margin: 0 auto;
   }
 
   .cat-btn {
-    padding: 8px 20px;
-    border-radius: 6px;
-    font-size: 14px;
+    padding: 8px 18px;
+    border-radius: 4px;
+    font-size: 13px;
     font-family: inherit;
     font-weight: 500;
-    border: 1.5px solid var(--border-color);
+    border: 1px solid var(--border-color);
     background: var(--bg-card);
     color: var(--text-secondary);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .cat-btn::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; width: 3px; height: 100%;
+    background: var(--matrix-green);
+    opacity: 0;
+    transition: opacity 0.2s;
   }
   .cat-btn:hover {
-    border-color: var(--matrix-green);
+    border-color: var(--matrix-green-dim);
     color: var(--matrix-green);
+    background: rgba(0, 255, 102, 0.02);
   }
   .cat-btn.active {
     background: var(--matrix-green-glow);
     border-color: var(--matrix-green);
     color: var(--matrix-green);
-    box-shadow: 0 0 10px rgba(0, 255, 102, 0.1);
+    box-shadow: 0 0 12px rgba(0, 255, 102, 0.1);
+  }
+  .cat-btn.active::before {
+    opacity: 1;
   }
 
   .main {
-    max-width: 1200px;
+    max-width: 1280px;
     margin: 0 auto;
-    padding: 0 24px 60px;
+    padding: 0 24px 80px;
+    position: relative;
   }
 
   .section {
-    margin-bottom: 48px;
+    margin-bottom: 56px;
   }
 
   .section-title {
     font-family: 'Fira Code', monospace;
-    font-size: 1.2rem;
-    font-weight: 700;
+    font-size: 1.15rem;
+    font-weight: 600;
     color: #FFFFFF;
-    margin-bottom: 24px;
+    margin-bottom: 28px;
     display: flex;
     align-items: center;
-    gap: 10px;
-    border-left: 3px solid var(--matrix-green);
-    padding-left: 12px;
+    gap: 12px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 12px;
+    position: relative;
+  }
+  .section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 60px;
+    height: 2px;
+    background: var(--matrix-green);
+    box-shadow: 0 0 8px var(--matrix-green);
   }
 
   .card-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 24px;
   }
 
+  /* 科技卡片樣式升級 */
   .prompt-card {
     background: var(--bg-card);
-    border-radius: 8px;
+    border-radius: 4px; /* 更方正硬朗的科幻棱角 */
     border: 1.5px solid var(--border-color);
     padding: 24px;
     display: flex;
     flex-direction: column;
-    gap: 14px;
-    transition: all 0.25s ease;
+    gap: 16px;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     position: relative;
     overflow: hidden;
   }
-  .prompt-card::before {
+  
+  /* 卡片裝飾：左上與右下的微細高亮點 */
+  .prompt-card::after {
     content: '';
     position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: var(--matrix-green);
-    opacity: 0.4;
+    top: 0; right: 0;
+    width: 0; height: 0;
+    border-style: solid;
+    border-width: 0 10px 10px 0;
+    border-color: transparent var(--border-color) transparent transparent;
+    transition: border-color 0.3s;
   }
+
   .prompt-card:hover {
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 255, 102, 0.1);
-    transform: translateY(-4px);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.9), 0 0 20px rgba(0, 255, 102, 0.08);
+    transform: translateY(-5px);
     border-color: var(--matrix-green);
   }
-  .prompt-card:hover::before {
-    opacity: 1;
+  .prompt-card:hover::after {
+    border-color: transparent var(--matrix-green) transparent transparent;
+  }
+
+  .card-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
   }
 
   .card-tag {
     display: inline-block;
     padding: 3px 10px;
-    border-radius: 4px;
+    border-radius: 3px;
     font-size: 11px;
     font-weight: 600;
     width: fit-content;
@@ -203,77 +367,140 @@
     font-family: 'Fira Code', monospace;
   }
 
+  /* 擴充閱讀/收折標記 */
+  .expand-indicator {
+    font-size: 11px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .expand-indicator:hover { color: var(--matrix-green); }
+
   .card-title {
     font-size: 1.15rem;
     font-weight: 700;
     color: #FFFFFF;
     line-height: 1.4;
+    letter-spacing: 0.5px;
+  }
+
+  /* 限制高度並提供局部滾動或點擊展開 */
+  .card-body-wrapper {
+    position: relative;
+    flex: 1;
   }
 
   .card-body {
     font-size: 13.5px;
     color: var(--text-secondary);
-    line-height: 1.7;
-    flex: 1;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 6;
-    -webkit-box-orient: vertical;
+    line-height: 1.75;
     white-space: pre-wrap;
+    max-height: 160px;
+    overflow-y: auto;
+    padding-right: 4px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
   }
 
-  .copy-btn {
-    display: block;
-    width: 100%;
-    padding: 12px;
-    background: #0A1410;
+  /* 自訂滾動條 */
+  .card-body::-webkit-scrollbar {
+    width: 4px;
+  }
+  .card-body::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .card-body::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: 2px;
+  }
+  .prompt-card:hover .card-body::-webkit-scrollbar-thumb {
+    background-color: var(--matrix-green-dim);
+  }
+
+  /* 底部按鈕區 */
+  .card-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: auto;
+  }
+
+  .copy-btn, .view-btn {
+    padding: 11px;
+    background: rgba(0, 255, 102, 0.02);
     color: var(--matrix-green);
-    border: 1.5px solid rgba(0, 255, 102, 0.3);
-    border-radius: 6px;
-    font-size: 14px;
-    font-family: inherit;
+    border: 1px solid rgba(0, 255, 102, 0.2);
+    border-radius: 4px;
+    font-size: 13px;
+    font-family: 'Fira Code', monospace;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s;
-    margin-top: 8px;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
   }
+
+  .copy-btn { flex: 2; }
+  .view-btn { flex: 1; color: var(--matrix-cyan); border-color: rgba(0, 240, 255, 0.2); background: rgba(0, 240, 255, 0.01); }
+
   .copy-btn:hover { 
     background: var(--matrix-green);
     color: #000000;
-    box-shadow: 0 0 15px rgba(0, 255, 102, 0.3);
+    box-shadow: 0 0 15px rgba(0, 255, 102, 0.4);
     border-color: var(--matrix-green);
   }
-  .copy-btn:active { transform: scale(0.98); }
+  .view-btn:hover {
+    background: var(--matrix-cyan);
+    color: #000000;
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+    border-color: var(--matrix-cyan);
+  }
+
+  .copy-btn:active, .view-btn:active { transform: scale(0.97); }
+  
   .copy-btn.copied { 
     background: #00FF66;
     color: #000000;
     border-color: #00FF66;
-    box-shadow: 0 0 20px rgba(0, 255, 102, 0.5);
+    box-shadow: 0 0 25px rgba(0, 255, 102, 0.6);
   }
 
+  /* 終端加載動畫 */
   .loading {
     text-align: center;
-    padding: 80px 20px;
+    padding: 100px 20px;
     color: var(--matrix-green);
     font-family: 'Fira Code', monospace;
     font-size: 15px;
+    letter-spacing: 2px;
   }
-  .spinner {
-    width: 40px; height: 40px;
-    border: 3px solid var(--border-color);
-    border-top-color: var(--matrix-green);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin: 0 auto 20px;
+  
+  .terminal-loader {
+    width: 60px;
+    height: 12px;
+    background: linear-gradient(90deg, var(--matrix-green) 33%, transparent 0, transparent 66%, var(--matrix-green) 0);
+    background-size: 40px 100%;
+    animation: loader-slide 0.8s infinite linear;
+    margin: 0 auto 24px;
+    border: 1px solid var(--matrix-green-dim);
   }
-  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @keyframes loader-slide {
+    to { background-position: 40px 0; }
+  }
 
   .empty {
     text-align: center;
-    padding: 60px 20px;
-    color: var(--text-muted);
+    padding: 80px 20px;
+    color: var(--matrix-red);
     font-family: 'Fira Code', monospace;
     font-size: 15px;
+    border: 1.5px dashed rgba(255, 59, 48, 0.3);
+    background: rgba(255, 59, 48, 0.02);
+    border-radius: 4px;
+    max-width: 600px;
+    margin: 40px auto;
   }
 
   .count-badge {
@@ -281,53 +508,198 @@
     font-size: 11px;
     background: var(--matrix-green-glow);
     color: var(--matrix-green);
-    padding: 1px 8px;
-    border-radius: 4px;
+    padding: 2px 8px;
+    border-radius: 3px;
     font-weight: 500;
     border: 1px solid rgba(0, 255, 102, 0.2);
   }
 
-  /* Matrix 風格分類標籤顏色定義 (保留適度色差，但全面走暗色綠/冷色系) */
-  .tag-content  { background: rgba(0, 255, 102, 0.08); color: #00FF66; border: 1px solid rgba(0, 255, 102, 0.2); }
-  .tag-note     { background: rgba(56, 189, 248, 0.08); color: #38BDF8; border: 1px solid rgba(56, 189, 248, 0.2); }
-  .tag-code     { background: rgba(34, 197, 94, 0.08);  color: #4ADE80; border: 1px solid rgba(34, 197, 94, 0.2); }
-  .tag-slide    { background: rgba(45, 212, 191, 0.08); color: #2DD4BF; border: 1px solid rgba(45, 212, 191, 0.2); }
-  .tag-gen      { background: rgba(0, 255, 102, 0.08); color: #00FF66; border: 1px solid rgba(0, 255, 102, 0.2); }
-  .tag-text     { background: rgba(148, 163, 184, 0.08); color: #CBD5E1; border: 1px solid rgba(148, 163, 184, 0.2); }
-  .tag-proof    { background: rgba(244, 63, 94, 0.08);   color: #FB7185; border: 1px solid rgba(244, 63, 94, 0.2); }
-  .tag-project  { background: rgba(14, 165, 233, 0.08);  color: #38BDF8; border: 1px solid rgba(14, 165, 233, 0.2); }
-  .tag-image    { background: rgba(20, 184, 166, 0.08);  color: #2DD4BF; border: 1px solid rgba(20, 184, 166, 0.2); }
-  .tag-organize { background: rgba(16, 185, 129, 0.08);  color: #34D399; border: 1px solid rgba(16, 185, 129, 0.2); }
-  .tag-info     { background: rgba(234, 179, 8, 0.08);   color: #FACC15; border: 1px solid rgba(234, 179, 8, 0.2); }
-  .tag-mind     { background: rgba(249, 115, 22, 0.08);  color: #FB923C; border: 1px solid rgba(249, 115, 22, 0.2); }
-  .tag-default  { background: rgba(71, 85, 105, 0.08);   color: #94A3B8; border: 1px solid rgba(71, 85, 105, 0.2); }
+  /* Matrix 風格分類標籤顏色：增加微發光感與邊框色差 */
+  .tag-content  { background: rgba(0, 255, 102, 0.08); color: #00FF66; border: 1px solid rgba(0, 255, 102, 0.3); }
+  .tag-note     { background: rgba(56, 189, 248, 0.08); color: #38BDF8; border: 1px solid rgba(56, 189, 248, 0.3); }
+  .tag-code     { background: rgba(34, 197, 94, 0.08);  color: #4ADE80; border: 1px solid rgba(34, 197, 94, 0.3); }
+  .tag-slide    { background: rgba(45, 212, 191, 0.08); color: #2DD4BF; border: 1px solid rgba(45, 212, 191, 0.3); }
+  .tag-gen      { background: rgba(0, 255, 102, 0.08); color: #00FF66; border: 1px solid rgba(0, 255, 102, 0.3); }
+  .tag-text     { background: rgba(148, 163, 184, 0.08); color: #CBD5E1; border: 1px solid rgba(148, 163, 184, 0.3); }
+  .tag-proof    { background: rgba(244, 63, 94, 0.08);   color: #FB7185; border: 1px solid rgba(244, 63, 94, 0.3); }
+  .tag-project  { background: rgba(14, 165, 233, 0.08);  color: #38BDF8; border: 1px solid rgba(14, 165, 233, 0.3); }
+  .tag-image    { background: rgba(20, 184, 166, 0.08);  color: #2DD4BF; border: 1px solid rgba(20, 184, 166, 0.3); }
+  .tag-organize { background: rgba(16, 185, 129, 0.08);  color: #34D399; border: 1px solid rgba(16, 185, 129, 0.3); }
+  .tag-info     { background: rgba(234, 179, 8, 0.08);   color: #FACC15; border: 1px solid rgba(234, 179, 8, 0.3); }
+  .tag-mind     { background: rgba(249, 115, 22, 0.08);  color: #FB923C; border: 1px solid rgba(249, 115, 22, 0.3); }
+  .tag-default  { background: rgba(71, 85, 105, 0.08);   color: #94A3B8; border: 1px solid rgba(71, 85, 105, 0.3); }
+
+  /* 彈出視窗（終端面板大圖模式） */
+  .modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(2, 2, 4, 0.85);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 20px;
+  }
+
+  .modal-container {
+    background: #0a0d14;
+    border: 2px solid var(--matrix-green);
+    border-radius: 4px;
+    width: 100%;
+    max-width: 800px;
+    box-shadow: 0 0 35px rgba(0, 255, 102, 0.25);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    max-height: 85vh;
+  }
+
+  .modal-header {
+    padding: 16px 24px;
+    border-bottom: 1.5px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0, 255, 102, 0.02);
+  }
+
+  .modal-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .modal-close {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 20px;
+    transition: color 0.2s;
+  }
+  .modal-close:hover { color: var(--matrix-red); }
+
+  .modal-body {
+    padding: 24px;
+    overflow-y: auto;
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--text-primary);
+    white-space: pre-wrap;
+    font-family: inherit;
+    flex: 1;
+  }
+
+  .modal-footer {
+    padding: 16px 24px;
+    border-top: 1.5px solid var(--border-color);
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+  }
+
+  /* 提示詞彈出通知 */
+  .toast-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 10001;
+    pointer-events: none;
+  }
+
+  .toast {
+    background: #05070b;
+    border: 1.5px solid var(--matrix-green);
+    color: var(--matrix-green);
+    padding: 14px 24px;
+    border-radius: 4px;
+    font-family: 'Fira Code', monospace;
+    font-size: 13px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 255, 102, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .toast.show {
+    transform: translateY(0);
+    opacity: 1;
+  }
 </style>
 </head>
 <body>
 
+<!-- 數位背景 Canvas -->
+<canvas id="matrix-bg"></canvas>
+<div class="grid-overlay"></div>
+
 <div class="top-bar">
-  <h1 class="site-title">> MATRIX_PROMPT_SYSTEM_</h1>
+  <!-- 科技感定位邊角 -->
+  <div class="decor-corner corner-tl"></div>
+  <div class="decor-corner corner-tr"></div>
+  <div class="decor-corner corner-bl"></div>
+  <div class="decor-corner corner-br"></div>
+
+  <h1 class="site-title">> 終極提示詞寶庫</h1>
+  <div class="site-subtitle">TERMINAL PROMPT MATRIX</div>
+  
   <a class="sheet-link" href="https://docs.google.com/spreadsheets/d/1Bpr4Dt4GhqbtOAdcUMiUHtv_VzsP369-Li-2R7p9XqQ/edit?gid=1480282197#gid=1480282197" target="_blank">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V10z"/><polyline points="14,3 14,10 21,10"/></svg>
-    ACCESS_SOURCE_GOOGLE_SHEET
+    ACCESS_SOURCE_GOOGLE_SHEET ↗
   </a>
 
-  <div class="search-wrap">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <input type="text" id="searchInput" placeholder="INITIALIZING SEARCH_...">
+  <div class="search-container">
+    <div class="search-wrap">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="searchInput" placeholder="INITIALIZE SEARCH_QUERY_...">
+      <button class="clear-btn" id="clearSearch">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
   </div>
 
-  <div class="category-row" id="categoryRow">
-    <button class="cat-btn active" data-cat="全部">全部</button>
+  <div class="category-outer">
+    <div class="category-row" id="categoryRow">
+      <!-- 分類按鈕動態載入 -->
+    </div>
   </div>
 </div>
 
 <div class="main">
   <div id="content">
     <div class="loading">
-      <div class="spinner"></div>
-      LOADING_DATABASE_...
+      <div class="terminal-loader"></div>
+      SYS_INITIALIZING_DATABASE_CONNECTING_...
     </div>
+  </div>
+</div>
+
+<!-- 全域模組 (Modal) 用於完整檢視 Prompt -->
+<div class="modal-overlay" id="promptModal">
+  <div class="modal-container">
+    <div class="modal-header">
+      <div class="modal-title">> VIEW_PROMPT_DETAILS</div>
+      <button class="modal-close" id="modalClose">&times;</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer">
+      <button class="copy-btn" id="modalCopyBtn">RUN_COPY_PROMPT</button>
+    </div>
+  </div>
+</div>
+
+<!-- 自訂通知 (Toast) -->
+<div class="toast-container">
+  <div class="toast" id="toast">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+    <span id="toastMsg">EXECUTION_SUCCESS_</span>
   </div>
 </div>
 
@@ -361,6 +733,90 @@ let allData = [];
 let activeCategory = '全部';
 let searchQuery = '';
 
+/* ==================== Background Matrix Digital Rain ==================== */
+const canvas = document.getElementById('matrix-bg');
+const ctx = canvas.getContext('2d');
+
+let columns = [];
+const fontSize = 14;
+
+function initMatrix() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const colCount = Math.floor(canvas.width / fontSize) + 1;
+  columns = [];
+  for (let i = 0; i < colCount; i++) {
+    columns.push({
+      x: i * fontSize,
+      y: Math.random() * -canvas.height,
+      speed: 1 + Math.random() * 3
+    });
+  }
+}
+
+function drawMatrix() {
+  ctx.fillStyle = 'rgba(2, 2, 4, 0.1)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  ctx.fillStyle = '#00ff66';
+  ctx.font = fontSize + 'px monospace';
+  
+  columns.forEach(col => {
+    // 隨機產生半形日文字、英數字、假名
+    const text = String.fromCharCode(33 + Math.floor(Math.random() * 93));
+    ctx.fillText(text, col.x, col.y);
+    
+    col.y += col.speed;
+    if (col.y > canvas.height) {
+      col.y = -50;
+      col.speed = 1 + Math.random() * 3;
+    }
+  });
+}
+
+window.addEventListener('resize', initMatrix);
+initMatrix();
+setInterval(drawMatrix, 33);
+
+
+/* ==================== 貼心通知 (Toast & Modal) ==================== */
+const toast = document.getElementById('toast');
+const toastMsg = document.getElementById('toastMsg');
+function showToast(msg) {
+  toastMsg.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 2500);
+}
+
+// 彈出視窗事件處理
+const modal = document.getElementById('promptModal');
+const modalBody = document.getElementById('modalBody');
+const modalCopyBtn = document.getElementById('modalCopyBtn');
+let currentModalPromptText = "";
+
+function openModal(title, text) {
+  modalBody.textContent = text;
+  document.querySelector('.modal-title').textContent = `> ${title}`;
+  currentModalPromptText = text;
+  modal.style.display = 'flex';
+}
+
+document.getElementById('modalClose').addEventListener('click', () => {
+  modal.style.display = 'none';
+});
+
+modal.addEventListener('click', (e) => {
+  if (e.target === modal) modal.style.display = 'none';
+});
+
+modalCopyBtn.addEventListener('click', () => {
+  copyText(currentModalPromptText, modalCopyBtn);
+});
+
+
+/* ==================== 資料載入與解析 ==================== */
 function getTagClass(cat) {
   return TAG_CLASS_MAP[cat] || 'tag-default';
 }
@@ -442,6 +898,46 @@ function getField(item, ...keys) {
   return '';
 }
 
+/* ==================== 複製功能優化 ==================== */
+function copyText(text, btnElement) {
+  // 利用 iFrame 相容方案與原生 Clipboard 整合
+  const fallbackCopy = (txt) => {
+    const ta = document.createElement('textarea');
+    ta.value = txt;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+      document.execCommand('copy');
+      onCopySuccess();
+    } catch (err) {
+      showToast('❌ COPY_FAILED');
+    }
+    document.body.removeChild(ta);
+  };
+
+  const onCopySuccess = () => {
+    showToast('✓ COPIED_TO_CLIPBOARD');
+    const origText = btnElement.textContent;
+    btnElement.textContent = '✓ COPIED_SUCCESS';
+    btnElement.classList.add('copied');
+    setTimeout(() => {
+      btnElement.textContent = origText;
+      btnElement.classList.remove('copied');
+    }, 2000);
+  };
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text)
+      .then(onCopySuccess)
+      .catch(() => fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+
+/* ==================== 渲染卡片 ==================== */
 function renderCard(item) {
   const title = getField(item, '標題', 'title', 'Title', '名稱');
   const prompt = getField(item, 'Prompt', 'prompt', '提示詞', '內容', 'content');
@@ -455,32 +951,30 @@ function renderCard(item) {
   card.dataset.prompt = prompt.toLowerCase();
 
   card.innerHTML = `
-    ${cat ? `<span class="card-tag ${tagClass}">${cat}</span>` : ''}
+    <div class="card-header-row">
+      ${cat ? `<span class="card-tag ${tagClass}">${cat}</span>` : '<span></span>'}
+    </div>
     ${title ? `<div class="card-title">${title}</div>` : ''}
-    <div class="card-body">${prompt}</div>
-    <button class="copy-btn" data-prompt="${prompt.replace(/"/g,'&quot;')}">RUN_COPY_PROMPT</button>
+    <div class="card-body-wrapper">
+      <div class="card-body">${prompt}</div>
+    </div>
+    <div class="card-actions">
+      <button class="copy-btn" data-prompt="${prompt.replace(/"/g,'&quot;')}">RUN_COPY_PROMPT</button>
+      <button class="view-btn" title="展開完整檢視">VIEW</button>
+    </div>
   `;
 
-  card.querySelector('.copy-btn').addEventListener('click', function() {
+  // 複製按鈕綁定
+  card.querySelector('.copy-btn').addEventListener('click', function(e) {
+    e.stopPropagation();
     const text = this.getAttribute('data-prompt');
-    navigator.clipboard.writeText(text).then(() => {
-      this.textContent = '✓ COPIED_SUCCESS';
-      this.classList.add('copied');
-      setTimeout(() => {
-        this.textContent = 'RUN_COPY_PROMPT';
-        this.classList.remove('copied');
-      }, 2000);
-    }).catch(() => {
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
-      this.textContent = '✓ COPIED_SUCCESS';
-      this.classList.add('copied');
-      setTimeout(() => { this.textContent = 'RUN_COPY_PROMPT'; this.classList.remove('copied'); }, 2000);
-    });
+    copyText(text, this);
+  });
+
+  // 檢視按鈕綁定
+  card.querySelector('.view-btn').addEventListener('click', function(e) {
+    e.stopPropagation();
+    openModal(title || 'PROMPT_DETAIL', prompt);
   });
 
   return card;
@@ -503,7 +997,11 @@ function render() {
   const filtered = filterData();
 
   if (filtered.length === 0) {
-    content.innerHTML = '<div class="empty">😕 ERROR: NO_MATCHING_PROMPT_FOUND</div>';
+    content.innerHTML = `
+      <div class="empty">
+        ⚠️ ERROR: NO_MATCHING_PROMPT_FOUND 
+        <br><span style="font-size: 12px; margin-top: 8px; display: inline-block; color: var(--text-secondary);">請重新搜尋其他關鍵字或變更分類。</span>
+      </div>`;
     return;
   }
 
@@ -514,11 +1012,11 @@ function render() {
     const secEl = document.createElement('div');
     secEl.className = 'section';
 
-    const emoji = SECTION_EMOJI[sec] || '📌';
+    const emoji = SECTION_EMOJI[sec] || '📡';
     secEl.innerHTML = `
       <div class="section-title">
         <span>${emoji} ${sec}</span>
-        <span class="count-badge">${items.length}</span>
+        <span class="count-badge">${items.length} DEVICES</span>
       </div>
       <div class="card-grid"></div>
     `;
@@ -529,14 +1027,16 @@ function render() {
   });
 }
 
+/* ==================== 頁面初始控制 ==================== */
 async function init() {
   const data = await loadData();
 
   if (!data) {
     document.getElementById('content').innerHTML = `
-      <div class="empty">
-        ⚠️ CONNECTION_FAILED: 請確認 Google Sheet 已設為「任何人可檢視」<br>
-        <a href="https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit?gid=${GID}" target="_blank" style="color:var(--matrix-green); text-decoration:none; margin-top:12px; display:inline-block;">RECONNECT_LINK ↗</a>
+      <div class="empty" style="border-color: var(--matrix-red);">
+        ⚠️ CONNECTION_FAILED: 無法存取資料母體。<br>
+        <span style="font-size:12.5px; color: var(--text-secondary); display:block; margin: 10px 0;">請確認您的 Google Sheet 已設定為「任何人可檢視」或再次嘗試連接。</span>
+        <a href="https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit?gid=${GID}" target="_blank" style="color:var(--matrix-green); text-decoration:none; font-weight: bold; margin-top:12px; display:inline-block;">[ RECONNECT_SOURCE_LINK ↗ ]</a>
       </div>`;
     return;
   }
@@ -563,8 +1063,25 @@ async function init() {
   render();
 }
 
-document.getElementById('searchInput').addEventListener('input', function() {
+/* ==================== 搜尋輸入交互處理 ==================== */
+const searchInput = document.getElementById('searchInput');
+const clearSearch = document.getElementById('clearSearch');
+
+searchInput.addEventListener('input', function() {
   searchQuery = this.value;
+  if (searchQuery.trim().length > 0) {
+    clearSearch.style.display = 'flex';
+  } else {
+    clearSearch.style.display = 'none';
+  }
+  render();
+});
+
+clearSearch.addEventListener('click', function() {
+  searchInput.value = '';
+  searchQuery = '';
+  clearSearch.style.display = 'none';
+  searchInput.focus();
   render();
 });
 
