@@ -740,6 +740,14 @@ const ctx = canvas.getContext('2d');
 let columns = [];
 const fontSize = 14;
 
+// 精心設計的字元集合：注音、英文字母、阿拉伯數字、日文平假名、日文片假名
+const zhuyin = 'ㄅㄆㄇㄈㄉㄊㄋㄌㄍㄎㄏㄐㄑㄒㄓㄔㄕㄖㄗㄘㄙㄚㄛㄜㄝㄞㄟㄠㄡㄢㄣㄤㄥㄦㄧㄨㄩ';
+const english = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const numbers = '0123456789';
+const hiragana = 'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん';
+const katakana = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+const charPool = zhuyin + english + numbers + hiragana + katakana;
+
 function initMatrix() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
@@ -749,7 +757,7 @@ function initMatrix() {
     columns.push({
       x: i * fontSize,
       y: Math.random() * -canvas.height,
-      speed: 1 + Math.random() * 3
+      speed: 0.5 + Math.random() * 8.5 // 速度差異加大：最慢 0.5 到最快 9.0，大幅提升景深感
     });
   }
 }
@@ -762,14 +770,14 @@ function drawMatrix() {
   ctx.font = fontSize + 'px monospace';
   
   columns.forEach(col => {
-    // 隨機產生半形日文字、英數字、假名
-    const text = String.fromCharCode(33 + Math.floor(Math.random() * 93));
+    // 從自訂混合池中隨機抽選字元
+    const text = charPool[Math.floor(Math.random() * charPool.length)];
     ctx.fillText(text, col.x, col.y);
     
     col.y += col.speed;
     if (col.y > canvas.height) {
       col.y = -50;
-      col.speed = 1 + Math.random() * 3;
+      col.speed = 0.5 + Math.random() * 8.5; // 重設雨滴落下速度
     }
   });
 }
