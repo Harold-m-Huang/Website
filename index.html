@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KURO STUDIO — 設計創作誌</title>
+<meta name="description" content="關於設計、創作與美學的深度思考">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Noto+Serif+TC:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* ═══════════════════════════════════════════
+   RESET & TOKENS
+═══════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink:      #0a0a0a;
+  --ink-2:    #111111;
+  --ink-3:    #1a1a1a;
+  --surface:  #141414;
+  --gold:     #c9a84c;
+  --gold-dim: #8a6f2e;
+  --cream:    #f0e9d8;
+  --mist:     #9a9188;
+  --smoke:    #3a3530;
+  --white:    #ffffff;
+  --radius:   4px;
+
+  --font-display: 'DM Serif Display', 'Noto Serif TC', serif;
+  --font-body:    'DM Sans', 'Noto Serif TC', sans-serif;
+  --font-serif:   'Noto Serif TC', serif;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--ink);
+  color: var(--cream);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ── Noise texture overlay ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.028;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ── Custom cursor ── */
+.cursor {
+  position: fixed;
+  width: 10px; height: 10px;
+  background: var(--gold);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 10000;
+  transform: translate(-50%, -50%);
+  transition: transform .1s, width .2s, height .2s, background .2s;
+  mix-blend-mode: difference;
+}
+.cursor.expand { width: 40px; height: 40px; background: var(--cream); }
+.cursor-ring {
+  position: fixed;
+  width: 36px; height: 36px;
+  border: 1px solid rgba(201,168,76,.4);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: transform .18s ease-out, width .3s, height .3s;
+}
+
+/* ═══════════════════════════════════════════
+   NAV
+═══════════════════════════════════════════ */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 48px;
+  height: 64px;
+  border-bottom: 1px solid rgba(201,168,76,.12);
+  background: rgba(10,10,10,.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.nav-logo {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  color: var(--gold);
+  letter-spacing: .12em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.nav-links {
+  display: flex;
+  gap: 36px;
+  list-style: none;
+}
+.nav-links a {
+  font-size: .78rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--mist);
+  text-decoration: none;
+  transition: color .2s;
+  position: relative;
+}
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -2px; left: 0; right: 100%;
+  height: 1px;
+  background: var(--gold);
+  transition: right .3s ease;
+}
+.nav-links a:hover { color: var(--cream); }
+.nav-links a:hover::after { right: 0; }
+
+.nav-search-btn {
+  background: none;
+  border: 1px solid var(--smoke);
+  color: var(--mist);
+  padding: 6px 14px;
+  font-family: var(--font-body);
+  font-size: .78rem;
+  letter-spacing: .1em;
+  cursor: none;
+  transition: all .2s;
+  border-radius: var(--radius);
+}
+.nav-search-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+/* hamburger */
+.hamburger { display: none; flex-direction: column; gap: 5px; background: none; border: none; cursor: none; padding: 4px; }
+.hamburger span { display: block; width: 24px; height: 1px; background: var(--mist); transition: all .3s; }
+.hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+/* mobile nav */
+.mobile-nav {
+  display: none;
+  position: fixed;
+  inset: 64px 0 0;
+  background: rgba(10,10,10,.97);
+  z-index: 99;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+}
+.mobile-nav.open { display: flex; }
+.mobile-nav a {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  color: var(--cream);
+  text-decoration: none;
+  letter-spacing: .04em;
+  transition: color .2s;
+}
+.mobile-nav a:hover { color: var(--gold); }
+
+/* ═══════════════════════════════════════════
+   SEARCH OVERLAY
+═══════════════════════════════════════════ */
+.search-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10,10,10,.96);
+  z-index: 200;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+.search-overlay.open { display: flex; }
+.search-close {
+  position: absolute;
+  top: 24px; right: 40px;
+  background: none; border: none;
+  color: var(--mist); font-size: 2rem;
+  cursor: none; transition: color .2s;
+}
+.search-close:hover { color: var(--cream); }
+.search-input-wrap {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--gold);
+  width: 100%; max-width: 640px;
+  padding: 12px 0;
+  gap: 16px;
+}
+.search-input-wrap svg { color: var(--gold); flex-shrink: 0; }
+#searchInput {
+  flex: 1;
+  background: none; border: none; outline: none;
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--cream);
+  caret-color: var(--gold);
+}
+#searchInput::placeholder { color: var(--smoke); }
+
+.search-results {
+  margin-top: 40px;
+  width: 100%; max-width: 640px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.search-result-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--smoke);
+  cursor: none;
+  transition: border-color .2s;
+}
+.search-result-item:hover { border-color: var(--gold-dim); }
+.search-result-item .ri-cat {
+  font-size: .72rem; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--gold);
+}
+.search-result-item .ri-title {
+  font-family: var(--font-display);
+  font-size: 1.3rem; color: var(--cream);
+}
+.search-result-item .ri-excerpt {
+  font-size: .85rem; color: var(--mist);
+}
+.search-empty { color: var(--mist); font-size: .9rem; }
+
+/* ═══════════════════════════════════════════
+   HERO
+═══════════════════════════════════════════ */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 80px 48px 64px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* animated grid lines */
+.hero-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(201,168,76,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,168,76,.04) 1px, transparent 1px);
+  background-size: 80px 80px;
+  animation: grid-drift 30s linear infinite;
+}
+@keyframes grid-drift {
+  from { background-position: 0 0; }
+  to   { background-position: 80px 80px; }
+}
+
+.hero-accent {
+  position: absolute;
+  top: 15%; right: 8%;
+  width: 320px; height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(201,168,76,.08) 0%, transparent 70%);
+  animation: pulse-glow 6s ease-in-out infinite alternate;
+}
+@keyframes pulse-glow {
+  from { transform: scale(1); opacity: .6; }
+  to   { transform: scale(1.3); opacity: 1; }
+}
+
+.hero-eyebrow {
+  font-size: .72rem;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 20px;
+  animation: fade-up .8s ease both;
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 8vw, 7rem);
+  line-height: 1.05;
+  letter-spacing: -.02em;
+  color: var(--cream);
+  max-width: 860px;
+  animation: fade-up .8s .12s ease both;
+}
+.hero-title em { color: var(--gold); font-style: italic; }
+
+.hero-sub {
+  margin-top: 28px;
+  font-size: 1rem;
+  color: var(--mist);
+  max-width: 420px;
+  line-height: 1.75;
+  animation: fade-up .8s .24s ease both;
+}
+
+.hero-cta {
+  margin-top: 44px;
+  display: flex;
+  gap: 16px;
+  animation: fade-up .8s .36s ease both;
+}
+.btn-primary {
+  padding: 12px 32px;
+  background: var(--gold);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: .82rem;
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  border: none;
+  cursor: none;
+  transition: background .2s, transform .15s;
+  text-decoration: none;
+  display: inline-block;
+}
+.btn-primary:hover { background: var(--cream); transform: translateY(-1px); }
+.btn-ghost {
+  padding: 12px 32px;
+  background: transparent;
+  color: var(--cream);
+  font-family: var(--font-body);
+  font-size: .82rem;
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  border: 1px solid var(--smoke);
+  cursor: none;
+  transition: border-color .2s, color .2s;
+  text-decoration: none;
+  display: inline-block;
+}
+.btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+
+.hero-scroll {
+  position: absolute;
+  bottom: 32px; right: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  animation: fade-up .8s .5s ease both;
+}
+.hero-scroll span {
+  font-size: .7rem; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--mist);
+  writing-mode: vertical-rl;
+}
+.scroll-line {
+  width: 1px; height: 60px;
+  background: linear-gradient(var(--gold), transparent);
+  animation: scroll-pulse 2s ease-in-out infinite;
+}
+@keyframes scroll-pulse {
+  0%, 100% { opacity: .4; transform: scaleY(1); }
+  50%       { opacity: 1;  transform: scaleY(1.1); }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══════════════════════════════════════════
+   SECTION LAYOUT
+═══════════════════════════════════════════ */
+section { padding: 80px 48px; }
+
+.section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 48px;
+  border-bottom: 1px solid var(--smoke);
+  padding-bottom: 16px;
+}
+.section-label {
+  font-size: .7rem; letter-spacing: .22em;
+  text-transform: uppercase; color: var(--gold);
+}
+.section-title {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  color: var(--cream);
+  margin-top: 6px;
+}
+.view-all {
+  font-size: .75rem; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--mist);
+  text-decoration: none;
+  border-bottom: 1px solid var(--smoke);
+  padding-bottom: 2px;
+  transition: color .2s, border-color .2s;
+  white-space: nowrap;
+}
+.view-all:hover { color: var(--gold); border-color: var(--gold); }
+
+/* ═══════════════════════════════════════════
+   FEATURED POST
+═══════════════════════════════════════════ */
+.featured-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  background: var(--smoke);
+}
+.featured-main {
+  background: var(--ink-2);
+  padding: 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 480px;
+  position: relative;
+  overflow: hidden;
+  cursor: none;
+  transition: background .3s;
+}
+.featured-main:hover { background: var(--ink-3); }
+.featured-main .bg-num {
+  position: absolute;
+  top: -20px; right: -10px;
+  font-family: var(--font-display);
+  font-size: 18rem;
+  color: rgba(201,168,76,.04);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+.featured-side {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  gap: 2px;
+  background: var(--smoke);
+}
+.featured-side-item {
+  background: var(--ink-2);
+  padding: 36px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  cursor: none;
+  transition: background .3s;
+}
+.featured-side-item:hover { background: var(--ink-3); }
+
+.post-cat {
+  font-size: .68rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 12px;
+}
+.post-title-lg {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  line-height: 1.2;
+  color: var(--cream);
+  margin-bottom: 14px;
+}
+.post-title-md {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  line-height: 1.3;
+  color: var(--cream);
+  margin-bottom: 10px;
+}
+.post-excerpt {
+  font-size: .85rem;
+  color: var(--mist);
+  line-height: 1.7;
+  margin-bottom: 24px;
+}
+.post-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: .72rem;
+  color: var(--smoke);
+  letter-spacing: .06em;
+}
+.post-meta .dot { color: var(--gold-dim); }
+.read-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .76rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--gold);
+  text-decoration: none;
+  margin-top: 20px;
+  transition: gap .2s;
+}
+.read-more:hover { gap: 14px; }
+
+/* ═══════════════════════════════════════════
+   CATEGORIES
+═══════════════════════════════════════════ */
+#categories { background: var(--ink-2); }
+
+.cat-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 48px;
+}
+.cat-btn {
+  padding: 8px 20px;
+  background: transparent;
+  border: 1px solid var(--smoke);
+  color: var(--mist);
+  font-family: var(--font-body);
+  font-size: .75rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  cursor: none;
+  transition: all .2s;
+  border-radius: var(--radius);
+}
+.cat-btn:hover, .cat-btn.active {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--ink);
+}
+
+.posts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--smoke);
+}
+.post-card {
+  background: var(--ink-2);
+  padding: 32px;
+  transition: background .3s;
+  cursor: none;
+  display: flex;
+  flex-direction: column;
+}
+.post-card:hover { background: var(--surface); }
+.post-card .post-title-sm {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  line-height: 1.35;
+  color: var(--cream);
+  margin-bottom: 12px;
+  flex: 1;
+}
+.post-card .post-excerpt-sm {
+  font-size: .82rem;
+  color: var(--mist);
+  line-height: 1.65;
+  margin-bottom: 20px;
+}
+.post-card .post-meta { margin-top: auto; }
+
+/* ═══════════════════════════════════════════
+   QUOTE BAND
+═══════════════════════════════════════════ */
+.quote-band {
+  padding: 80px 48px;
+  background: var(--gold);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.quote-band::before {
+  content: '❝';
+  position: absolute;
+  top: -40px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 18rem;
+  color: rgba(10,10,10,.07);
+  font-family: serif;
+  line-height: 1;
+}
+.quote-text {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 3.5vw, 2.8rem);
+  color: var(--ink);
+  line-height: 1.3;
+  max-width: 760px;
+  margin: 0 auto 24px;
+  position: relative;
+}
+.quote-author {
+  font-size: .8rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--ink);
+  opacity: .6;
+}
+
+/* ═══════════════════════════════════════════
+   RECENT POSTS
+═══════════════════════════════════════════ */
+.recent-list {
+  display: flex;
+  flex-direction: column;
+}
+.recent-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 32px;
+  padding: 28px 0;
+  border-bottom: 1px solid var(--smoke);
+  cursor: none;
+  transition: border-color .2s;
+}
+.recent-item:hover { border-color: var(--gold-dim); }
+.recent-item:hover .recent-title { color: var(--gold); }
+.recent-item:first-child { border-top: 1px solid var(--smoke); }
+.recent-cat {
+  font-size: .68rem; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--gold);
+  margin-bottom: 6px;
+}
+.recent-title {
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  color: var(--cream);
+  line-height: 1.3;
+  transition: color .2s;
+}
+.recent-meta {
+  font-size: .75rem; color: var(--mist);
+  letter-spacing: .06em; margin-top: 8px;
+}
+.recent-num {
+  font-family: var(--font-display);
+  font-size: 3.5rem;
+  color: rgba(201,168,76,.15);
+  line-height: 1;
+}
+
+/* ═══════════════════════════════════════════
+   NEWSLETTER
+═══════════════════════════════════════════ */
+.newsletter {
+  background: var(--ink-2);
+  border: 1px solid var(--smoke);
+  margin: 0 48px 80px;
+  padding: 64px 80px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  align-items: center;
+}
+.nl-title {
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  line-height: 1.2;
+  color: var(--cream);
+  margin-bottom: 12px;
+}
+.nl-sub { font-size: .9rem; color: var(--mist); line-height: 1.7; }
+.nl-form { display: flex; flex-direction: column; gap: 12px; }
+.nl-input {
+  background: var(--ink);
+  border: 1px solid var(--smoke);
+  color: var(--cream);
+  font-family: var(--font-body);
+  font-size: .9rem;
+  padding: 14px 20px;
+  outline: none;
+  transition: border-color .2s;
+  border-radius: var(--radius);
+}
+.nl-input:focus { border-color: var(--gold); }
+.nl-input::placeholder { color: var(--smoke); }
+.nl-btn {
+  padding: 14px 32px;
+  background: var(--gold);
+  border: none;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: .82rem;
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  cursor: none;
+  transition: background .2s;
+  border-radius: var(--radius);
+}
+.nl-btn:hover { background: var(--cream); }
+.nl-note { font-size: .72rem; color: var(--mist); }
+
+/* ═══════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════ */
+footer {
+  border-top: 1px solid var(--smoke);
+  padding: 48px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 48px;
+}
+.footer-logo {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  color: var(--gold);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.footer-tagline { font-size: .85rem; color: var(--mist); line-height: 1.7; }
+.footer-col h4 {
+  font-size: .7rem; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--gold);
+  margin-bottom: 20px;
+}
+.footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.footer-col a {
+  font-size: .85rem; color: var(--mist);
+  text-decoration: none; transition: color .2s;
+}
+.footer-col a:hover { color: var(--cream); }
+.footer-bottom {
+  border-top: 1px solid var(--smoke);
+  padding: 20px 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.footer-bottom p { font-size: .75rem; color: var(--smoke); letter-spacing: .06em; }
+
+/* ═══════════════════════════════════════════
+   PAGE VIEWS (SPA routing)
+═══════════════════════════════════════════ */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════ */
+@media (max-width: 900px) {
+  nav { padding: 0 24px; }
+  .nav-links, .nav-search-btn { display: none; }
+  .hamburger { display: flex; }
+
+  .hero { padding: 80px 24px 48px; }
+  section { padding: 60px 24px; }
+
+  .featured-grid { grid-template-columns: 1fr; }
+  .featured-side { grid-template-rows: auto auto; }
+  .posts-grid { grid-template-columns: 1fr; }
+
+  .newsletter { grid-template-columns: 1fr; margin: 0 24px 48px; padding: 40px 32px; gap: 32px; }
+  footer { grid-template-columns: 1fr; gap: 32px; padding: 40px 24px; }
+  .footer-bottom { padding: 20px 24px; flex-direction: column; gap: 8px; text-align: center; }
+
+  .recent-item { grid-template-columns: 1fr; }
+  .recent-num { display: none; }
+}
+
+/* ═══════════════════════════════════════════
+   SCROLL REVEAL
+═══════════════════════════════════════════ */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity .7s ease, transform .7s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+</style>
+</head>
+<body>
+
+<!-- Custom Cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- Search Overlay -->
+<div class="search-overlay" id="searchOverlay">
+  <button class="search-close" id="searchClose">✕</button>
+  <div class="search-input-wrap">
+    <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+    <input type="text" id="searchInput" placeholder="搜尋文章…" autocomplete="off">
+  </div>
+  <div class="search-results" id="searchResults"></div>
+</div>
+
+<!-- Navigation -->
+<nav>
+  <a href="#" class="nav-logo" onclick="showPage('home')">Kuro Studio</a>
+  <ul class="nav-links">
+    <li><a href="#" onclick="showPage('home')">首頁</a></li>
+    <li><a href="#categories">分類</a></li>
+    <li><a href="#recent">近期文章</a></li>
+    <li><a href="#about">關於</a></li>
+  </ul>
+  <button class="nav-search-btn" id="searchBtn">⌕ 搜尋</button>
+  <button class="hamburger" id="hamburger">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- Mobile Nav -->
+<div class="mobile-nav" id="mobileNav">
+  <a href="#" onclick="closeMobile();showPage('home')">首頁</a>
+  <a href="#categories" onclick="closeMobile()">分類</a>
+  <a href="#recent" onclick="closeMobile()">近期文章</a>
+  <a href="#about" onclick="closeMobile()">關於</a>
+</div>
+
+<!-- ══════════════ HOME PAGE ══════════════ -->
+<div id="homePage" class="page active">
+
+  <!-- Hero -->
+  <section class="hero" id="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-accent"></div>
+    <p class="hero-eyebrow">設計創作誌 · Vol. 2025</p>
+    <h1 class="hero-title">
+      美學是一種<br><em>選擇</em>，<br>不是偶然
+    </h1>
+    <p class="hero-sub">深入探索設計思維、創作過程與視覺語言，獻給每一個相信「形式即內容」的靈魂。</p>
+    <div class="hero-cta">
+      <a href="#featured" class="btn-primary">開始閱讀</a>
+      <a href="#categories" class="btn-ghost">瀏覽分類</a>
+    </div>
+    <div class="hero-scroll">
+      <div class="scroll-line"></div>
+      <span>Scroll</span>
+    </div>
+  </section>
+
+  <!-- Featured -->
+  <section id="featured">
+    <div class="section-header reveal">
+      <div>
+        <p class="section-label">精選文章</p>
+        <h2 class="section-title">編輯推薦</h2>
+      </div>
+      <a href="#" class="view-all">查看全部 →</a>
+    </div>
+    <div class="featured-grid reveal">
+      <article class="featured-main" onclick="openPost(0)">
+        <div class="bg-num">01</div>
+        <p class="post-cat">排版設計</p>
+        <h2 class="post-title-lg">字型選擇如何<br>改變你的設計語氣</h2>
+        <p class="post-excerpt">字體不只是文字的容器，它是設計師最直接的情感傳遞工具。從Serif到Sans-serif，每一個選擇都在默默說著話。</p>
+        <div class="post-meta">
+          <span>2025 年 11 月</span>
+          <span class="dot">·</span>
+          <span>8 分鐘閱讀</span>
+        </div>
+        <a href="#" class="read-more">閱讀全文 →</a>
+      </article>
+      <div class="featured-side">
+        <article class="featured-side-item" onclick="openPost(1)">
+          <p class="post-cat">色彩理論</p>
+          <h3 class="post-title-md">黑色的一百種面孔——暗色設計的哲學</h3>
+          <div class="post-meta">
+            <span>2025 年 10 月</span><span class="dot">·</span><span>6 分鐘</span>
+          </div>
+        </article>
+        <article class="featured-side-item" onclick="openPost(2)">
+          <p class="post-cat">設計流程</p>
+          <h3 class="post-title-md">從混沌到秩序：我的設計思考框架</h3>
+          <div class="post-meta">
+            <span>2025 年 10 月</span><span class="dot">·</span><span>10 分鐘</span>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quote Band -->
+  <div class="quote-band reveal">
+    <p class="quote-text">「好的設計是讓人感受不到設計存在，卻能清晰地感受到設計的意圖。」</p>
+    <p class="quote-author">— Dieter Rams</p>
+  </div>
+
+  <!-- Categories -->
+  <section id="categories">
+    <div class="section-header reveal">
+      <div>
+        <p class="section-label">文章分類</p>
+        <h2 class="section-title">按主題探索</h2>
+      </div>
+    </div>
+    <div class="cat-filter reveal" id="catFilter">
+      <button class="cat-btn active" data-cat="全部">全部</button>
+      <button class="cat-btn" data-cat="排版設計">排版設計</button>
+      <button class="cat-btn" data-cat="色彩理論">色彩理論</button>
+      <button class="cat-btn" data-cat="設計流程">設計流程</button>
+      <button class="cat-btn" data-cat="品牌識別">品牌識別</button>
+      <button class="cat-btn" data-cat="UI設計">UI 設計</button>
+      <button class="cat-btn" data-cat="創作手記">創作手記</button>
+    </div>
+    <div class="posts-grid reveal" id="postsGrid"></div>
+  </section>
+
+  <!-- Recent Posts -->
+  <section id="recent">
+    <div class="section-header reveal">
+      <div>
+        <p class="section-label">最新更新</p>
+        <h2 class="section-title">近期文章</h2>
+      </div>
+      <a href="#" class="view-all">查看全部 →</a>
+    </div>
+    <div class="recent-list reveal" id="recentList"></div>
+  </section>
+
+  <!-- Newsletter -->
+  <div class="newsletter reveal">
+    <div>
+      <h3 class="nl-title">訂閱創作<br>週報</h3>
+      <p class="nl-sub">每週精選設計靈感、深度文章與創作資源，直送你的信箱。不灌水，只分享真正有價值的內容。</p>
+    </div>
+    <div>
+      <div class="nl-form">
+        <input class="nl-input" type="text" placeholder="你的名字">
+        <input class="nl-input" type="email" placeholder="電子郵件地址">
+        <button class="nl-btn" onclick="subscribe()">立即訂閱</button>
+        <p class="nl-note">尊重你的隱私，隨時可以退訂。</p>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /homePage -->
+
+<!-- Footer (always visible) -->
+<footer>
+  <div>
+    <div class="footer-logo">Kuro Studio</div>
+    <p class="footer-tagline">關於設計、創作與美學的深度思考誌。寫給每一個在意細節的創作者。</p>
+  </div>
+  <div class="footer-col">
+    <h4>文章分類</h4>
+    <ul>
+      <li><a href="#categories" onclick="filterCat('排版設計')">排版設計</a></li>
+      <li><a href="#categories" onclick="filterCat('色彩理論')">色彩理論</a></li>
+      <li><a href="#categories" onclick="filterCat('設計流程')">設計流程</a></li>
+      <li><a href="#categories" onclick="filterCat('品牌識別')">品牌識別</a></li>
+      <li><a href="#categories" onclick="filterCat('UI設計')">UI 設計</a></li>
+    </ul>
+  </div>
+  <div class="footer-col">
+    <h4>關於</h4>
+    <ul>
+      <li><a href="#">關於本誌</a></li>
+      <li><a href="#">聯絡我</a></li>
+      <li><a href="#">訂閱週報</a></li>
+      <li><a href="https://github.com" target="_blank">GitHub</a></li>
+    </ul>
+  </div>
+</footer>
+<div class="footer-bottom">
+  <p>© 2025 Kuro Studio — 設計創作誌</p>
+  <p>以 ♥ 和 太多咖啡 製作</p>
+</div>
+
+<!-- ═══════════════ JS ═══════════════ -->
+<script>
+/* ── DATA ── */
+const POSTS = [
+  { id:0, cat:'排版設計', title:'字型選擇如何改變你的設計語氣', excerpt:'字體不只是文字的容器，它是設計師最直接的情感傳遞工具。從Serif到Sans-serif，每一個選擇都在默默說著話。', date:'2025/11/15', readTime:'8 分鐘' },
+  { id:1, cat:'色彩理論', title:'黑色的一百種面孔——暗色設計的哲學', excerpt:'當設計師選擇黑色時，他們究竟在說什麼？探索從柔和炭黑到深邃宇宙黑的設計語言差異。', date:'2025/10/28', readTime:'6 分鐘' },
+  { id:2, cat:'設計流程', title:'從混沌到秩序：我的設計思考框架', excerpt:'每個設計師都有一套讓靈感落地的方法。這是我在十年創作中整理出的思考地圖。', date:'2025/10/14', readTime:'10 分鐘' },
+  { id:3, cat:'品牌識別', title:'標誌背後的故事：符號如何承載意義', excerpt:'一個好的標誌，是品牌最精煉的自我介紹。它不只是圖案，而是一個凝縮的敘事。', date:'2025/09/30', readTime:'7 分鐘' },
+  { id:4, cat:'UI設計', title:'微互動：設計中被低估的情感連結', excerpt:'Hover 狀態、載入動畫、按鈕回饋——這些微小的細節，正是用戶愛上一個產品的真正原因。', date:'2025/09/15', readTime:'5 分鐘' },
+  { id:5, cat:'創作手記', title:'創作者的倦怠與重生：一段誠實的紀錄', excerpt:'設計師也會有靈感枯竭的時候。這是一篇關於如何在創作低谷中找回自己的私人手記。', date:'2025/09/02', readTime:'9 分鐘' },
+  { id:6, cat:'排版設計', title:'中文排版的12個黃金規則', excerpt:'中文排版有其獨特的挑戰與美感。整理了12條讓中文內容更易讀、更美觀的實用準則。', date:'2025/08/20', readTime:'11 分鐘' },
+  { id:7, cat:'色彩理論', title:'2026 年設計趨勢：從色彩預測看創作走向', excerpt:'每年的流行色不只是流行，它反映了時代的集體情感。看看明年的設計語彙將往何處去。', date:'2025/08/05', readTime:'6 分鐘' },
+  { id:8, cat:'品牌識別', title:'小品牌也能擁有強大視覺系統的五個步驟', excerpt:'你不需要大預算才能有好的品牌識別。這五個步驟讓任何規模的品牌都能建立一致的視覺語言。', date:'2025/07/22', readTime:'8 分鐘' },
+];
+
+let activeCat = '全部';
+
+/* ── RENDER POSTS GRID ── */
+function renderGrid() {
+  const filtered = activeCat === '全部' ? POSTS : POSTS.filter(p => p.cat === activeCat);
+  const grid = document.getElementById('postsGrid');
+  grid.innerHTML = filtered.map(p => `
+    <article class="post-card" onclick="openPost(${p.id})">
+      <p class="post-cat">${p.cat}</p>
+      <h3 class="post-title-sm">${p.title}</h3>
+      <p class="post-excerpt-sm">${p.excerpt}</p>
+      <div class="post-meta">
+        <span>${p.date}</span>
+        <span class="dot">·</span>
+        <span>${p.readTime}閱讀</span>
+      </div>
+    </article>`).join('');
+}
+
+/* ── RENDER RECENT ── */
+function renderRecent() {
+  const list = document.getElementById('recentList');
+  list.innerHTML = POSTS.slice(0, 6).map((p, i) => `
+    <article class="recent-item" onclick="openPost(${p.id})">
+      <div>
+        <p class="recent-cat">${p.cat}</p>
+        <h3 class="recent-title">${p.title}</h3>
+        <p class="recent-meta">${p.date} · ${p.readTime}閱讀</p>
+      </div>
+      <div class="recent-num">0${i+1}</div>
+    </article>`).join('');
+}
+
+/* ── CATEGORY FILTER ── */
+document.getElementById('catFilter').addEventListener('click', e => {
+  const btn = e.target.closest('.cat-btn');
+  if (!btn) return;
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeCat = btn.dataset.cat;
+  renderGrid();
+});
+
+function filterCat(cat) {
+  activeCat = cat;
+  document.querySelectorAll('.cat-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.cat === cat);
+  });
+  renderGrid();
+}
+
+/* ── OPEN POST (placeholder) ── */
+function openPost(id) {
+  const p = POSTS[id];
+  alert(`📖 開啟文章：「${p.title}」\n\n實際使用時，請在此處加入文章頁面路由或連結至各篇文章的 HTML 檔案。`);
+}
+
+/* ── SEARCH ── */
+document.getElementById('searchBtn').addEventListener('click', openSearch);
+document.getElementById('searchClose').addEventListener('click', closeSearch);
+
+function openSearch() {
+  document.getElementById('searchOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('searchInput').focus(), 100);
+}
+function closeSearch() {
+  document.getElementById('searchOverlay').classList.remove('open');
+  document.getElementById('searchInput').value = '';
+  document.getElementById('searchResults').innerHTML = '';
+}
+
+document.getElementById('searchInput').addEventListener('input', e => {
+  const q = e.target.value.trim().toLowerCase();
+  const res = document.getElementById('searchResults');
+  if (!q) { res.innerHTML = ''; return; }
+  const found = POSTS.filter(p =>
+    p.title.toLowerCase().includes(q) ||
+    p.cat.toLowerCase().includes(q) ||
+    p.excerpt.toLowerCase().includes(q)
+  );
+  if (!found.length) {
+    res.innerHTML = '<p class="search-empty">找不到相關文章。</p>';
+    return;
+  }
+  res.innerHTML = found.map(p => `
+    <div class="search-result-item" onclick="closeSearch();openPost(${p.id})">
+      <span class="ri-cat">${p.cat}</span>
+      <span class="ri-title">${p.title}</span>
+      <span class="ri-excerpt">${p.excerpt.slice(0, 60)}…</span>
+    </div>`).join('');
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeSearch();
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); openSearch(); }
+});
+
+/* ── MOBILE NAV ── */
+const hamburger = document.getElementById('hamburger');
+const mobileNav = document.getElementById('mobileNav');
+hamburger.addEventListener('click', () => {
+  hamburger.classList.toggle('open');
+  mobileNav.classList.toggle('open');
+});
+function closeMobile() {
+  hamburger.classList.remove('open');
+  mobileNav.classList.remove('open');
+}
+
+/* ── NEWSLETTER ── */
+function subscribe() {
+  alert('感謝訂閱！✨ 你的創作週報將會定期寄出。');
+}
+
+/* ── CUSTOM CURSOR ── */
+const cursor = document.getElementById('cursor');
+const ring   = document.getElementById('cursorRing');
+let mx = 0, my = 0, rx = 0, ry = 0;
+
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+
+function animCursor() {
+  cursor.style.left = mx + 'px';
+  cursor.style.top  = my + 'px';
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
+  ring.style.left = rx + 'px';
+  ring.style.top  = ry + 'px';
+  requestAnimationFrame(animCursor);
+}
+animCursor();
+
+document.querySelectorAll('a, button, .post-card, .featured-main, .featured-side-item, .recent-item, .search-result-item').forEach(el => {
+  el.addEventListener('mouseenter', () => cursor.classList.add('expand'));
+  el.addEventListener('mouseleave', () => cursor.classList.remove('expand'));
+});
+
+/* ── SCROLL REVEAL ── */
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+/* ── INIT ── */
+renderGrid();
+renderRecent();
+</script>
+</body>
+</html>
