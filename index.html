@@ -61,7 +61,7 @@
     pointer-events: none;
   }
 
-  /* Matrix 前景黃金雨 Canvas (在內容前方，穿透所有元件) */
+  /* Matrix 前景特殊霓虹雨 Canvas (在內容前方，穿透所有元件) */
   #matrix-fg {
     position: fixed;
     top: 0;
@@ -69,7 +69,7 @@
     width: 100%;
     height: 100%;
     z-index: 9998; /* 低於掃描線的 9999，但高於一切主要內容 */
-    pointer-events: none; /* 極重要：穿透滑鼠事件，讓下方的按鈕、文字仍能被點擊選取 */
+    pointer-events: none; /* 極重要：穿透滑鼠事件 */
   }
 
   /* 網格網線背景 */
@@ -232,7 +232,7 @@
   .clear-btn:hover { color: var(--matrix-green); }
   .clear-btn svg { width: 18px; height: 18px; }
 
-  /* 雙重選單面板 (Console Dashboard) */
+  /* 雙重選單面板 */
   .filter-panel {
     max-width: 1000px;
     margin: 0 auto 32px;
@@ -562,7 +562,7 @@
   .tag-mind     { background: rgba(249, 115, 22, 0.08);  color: #FB923C; border: 1px solid rgba(249, 115, 22, 0.3); }
   .tag-default  { background: rgba(71, 85, 105, 0.08);   color: #94A3B8; border: 1px solid rgba(71, 85, 105, 0.3); }
 
-  /* 彈出視窗（終端面板大圖模式） */
+  /* 彈出視窗 */
   .modal-overlay {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
@@ -665,6 +665,21 @@
     transform: translateY(0);
     opacity: 1;
   }
+
+  /* 響應式微調 */
+  @media (max-width: 768px) {
+    .filter-row {
+      flex-direction: column;
+      gap: 8px;
+    }
+    .filter-label {
+      min-width: auto;
+      padding-top: 0;
+    }
+    .site-title {
+      font-size: 1.8rem;
+    }
+  }
 </style>
 </head>
 <body>
@@ -700,7 +715,7 @@
     </div>
   </div>
 
-  <!-- 雙重過濾主控制面板 (Dual Filtering Panel) -->
+  <!-- 雙重過濾主控制面板 -->
   <div class="filter-panel">
     <!-- 第一重：Type/主題 -->
     <div class="filter-row">
@@ -793,13 +808,42 @@ const ctxFg = canvasFg.getContext('2d');
 let columns = [];
 const fontSize = 14;
 
-// 精心設計的字元集合：注音、英文字母、阿拉伯數字、日文平假名、日文片假名
+// 字元集合
 const zhuyin = 'ㄅㄆㄇㄈㄉㄊㄋㄌㄍㄎㄏㄐㄑㄒㄓㄔㄕㄖㄗㄘㄙㄚㄛㄜㄝㄞㄟㄠㄡㄢㄣㄤㄥㄦㄧㄨㄩ';
 const english = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const numbers = '0123456789';
 const hiragana = 'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん';
 const katakana = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
 const charPool = zhuyin + english + numbers + hiragana + katakana;
+
+// 定義特殊雨滴配色
+const SPECIAL_COLORS = {
+  gold: {
+    text: 'rgba(255, 215, 0, ',
+    glow: 'rgba(255, 231, 0, '
+  },
+  blue: {
+    text: 'rgba(0, 112, 255, ',
+    glow: 'rgba(0, 150, 255, '
+  },
+  red: {
+    text: 'rgba(255, 30, 30, ',
+    glow: 'rgba(255, 80, 80, '
+  },
+  green: {
+    text: 'rgba(0, 255, 128, ',
+    glow: 'rgba(50, 255, 170, '
+  }
+};
+
+const specialTypes = ['gold', 'blue', 'red', 'green'];
+const lastSpecialTimes = { gold: Date.now(), blue: Date.now(), red: Date.now(), green: Date.now() };
+const specialIntervals = {
+  gold: 3000 + Math.random() * 2000,
+  blue: 4000 + Math.random() * 3000,
+  red: 5000 + Math.random() * 3000,
+  green: 4500 + Math.random() * 3000
+};
 
 function initMatrix() {
   const w = window.innerWidth;
@@ -816,70 +860,66 @@ function initMatrix() {
     columns.push({
       x: i * fontSize,
       y: Math.random() * -h,
-      speed: 0.5 + Math.random() * 8.5, // 速度差異
-      opacity: 0.15 + Math.random() * 0.85, // 隨機綠色雨滴明暗度
-      isGolden: false, // 是否為特殊黃金雨滴
-      goldHistory: [] // 用於儲存前景黃金雨滴的歷史殘影軌跡
+      speed: 0.5 + Math.random() * 8.5,
+      opacity: 0.15 + Math.random() * 0.85,
+      specialType: null, // 可為 'gold' | 'blue' | 'red' | 'green' | null
+      specialOpacity: 0.3 + Math.random() * 0.5, // 隨機 0.3 到 0.8
+      specialHistory: []
     });
   }
 }
 
-// 追蹤上一次產生黃金雨滴的時間
-let lastGoldTime = Date.now();
-// 隨機產生下一次黃金雨滴出現的冷卻間隔 (3000 ~ 5000 毫秒)
-let goldInterval = 3000 + Math.random() * 2000;
-
 function drawMatrix() {
-  // 1. 清除背景 Canvas，用帶有尾跡深度的 semi-transparent 黑色填滿
   ctxBg.fillStyle = 'rgba(2, 2, 4, 0.14)';
   ctxBg.fillRect(0, 0, canvasBg.width, canvasBg.height);
 
-  // 2. 徹底清除前景 Canvas（因為前景完全透明，不能用填滿黑色的方式產生殘影）
   ctxFg.clearRect(0, 0, canvasFg.width, canvasFg.height);
 
-  // 3. 定期觸發前景黃金雨滴產生機制
-  if (Date.now() - lastGoldTime > goldInterval) {
-    const randomCol = columns[Math.floor(Math.random() * columns.length)];
-    if (randomCol && !randomCol.isGolden) {
-      randomCol.isGolden = true;
-      randomCol.speed = 4.5 + Math.random() * 3.5; // 黃金雨滴的速度稍微快且穩定一些
-      randomCol.y = -80; // 從頂部更上方起跑
-      randomCol.goldHistory = []; // 初始化軌跡紀錄
+  // 定期觸發各個霓虹雨滴，確保畫面上「各有一滴」特殊雨滴在跑
+  specialTypes.forEach(type => {
+    const isAlreadyActive = columns.some(col => col.specialType === type);
+    if (!isAlreadyActive && (Date.now() - lastSpecialTimes[type] > specialIntervals[type])) {
+      const candidates = columns.filter(col => !col.specialType);
+      if (candidates.length > 0) {
+        const randomCol = candidates[Math.floor(Math.random() * candidates.length)];
+        randomCol.specialType = type;
+        randomCol.speed = 4.5 + Math.random() * 3.5;
+        randomCol.y = -80; // 從頂部更上方起跑
+        randomCol.specialOpacity = 0.3 + Math.random() * 0.5; // 隨機透明度 0.3-0.8
+        randomCol.specialHistory = []; // 初始化影格歷史紀錄
+      }
+      lastSpecialTimes[type] = Date.now();
+      specialIntervals[type] = 3000 + Math.random() * 3000; // 重新隨機決定下次冷卻
     }
-    lastGoldTime = Date.now();
-    // 每次觸發後重新隨機決定下一次的冷卻間隔 (3 到 5 秒)
-    goldInterval = 3000 + Math.random() * 2000;
-  }
+  });
   
   columns.forEach(col => {
     const text = charPool[Math.floor(Math.random() * charPool.length)];
 
-    if (col.isGolden) {
-      // ===== 前景黃金雨滴渲染機制 =====
-      // 記錄此影格的位置與隨機字元
-      col.goldHistory.push({ y: col.y, char: text });
+    if (col.specialType) {
+      // ===== 前景特殊雨滴渲染機制 =====
+      col.specialHistory.push({ y: col.y, char: text });
       
-      // 限制軌跡長度，長度 10 代表後面會有漂亮的手動漸暗光跡
-      if (col.goldHistory.length > 10) {
-        col.goldHistory.shift();
+      if (col.specialHistory.length > 10) {
+        col.specialHistory.shift();
       }
 
       ctxFg.font = fontSize + 'px monospace';
-      col.goldHistory.forEach((historyItem, index) => {
-        // 光跡尾端最暗，最前方（頭部）完全不透明清晰
-        const alpha = (index + 1) / col.goldHistory.length;
-        ctxFg.fillStyle = `rgba(255, 215, 0, ${alpha})`;
+      const config = SPECIAL_COLORS[col.specialType];
 
-        // 只讓最前方（最後加入陣列）的雨滴頭部具有霓虹外發光，防止整條光跡太刺眼
-        if (index === col.goldHistory.length - 1) {
+      col.specialHistory.forEach((historyItem, index) => {
+        const alpha = ((index + 1) / col.specialHistory.length) * col.specialOpacity;
+        ctxFg.fillStyle = `${config.text}${alpha})`;
+
+        // 僅雨滴頭部具有發光特效，使霓虹質感更立體
+        if (index === col.specialHistory.length - 1) {
           ctxFg.shadowBlur = 15;
-          ctxFg.shadowColor = '#FFE700';
+          ctxFg.shadowColor = `${config.glow}${col.specialOpacity})`;
         } else {
           ctxFg.shadowBlur = 0;
         }
         ctxFg.fillText(historyItem.char, col.x, historyItem.y);
       });
-      // 重置發光設定，避免影響其他前景繪製
       ctxFg.shadowBlur = 0;
 
     } else {
@@ -889,16 +929,16 @@ function drawMatrix() {
       ctxBg.fillText(text, col.x, col.y);
     }
 
-    // 更新垂直下墬位置
     col.y += col.speed;
 
-    // 當雨滴超過畫布底部，重置回最上方並還原狀態
+    // 落地重置
     if (col.y > canvasBg.height) {
       col.y = -50;
       col.speed = 0.5 + Math.random() * 8.5;
       col.opacity = 0.15 + Math.random() * 0.85;
-      col.isGolden = false;
-      col.goldHistory = []; // 清空殘影
+      col.specialType = null; // 還原普通狀態
+      col.specialOpacity = 0.3 + Math.random() * 0.5;
+      col.specialHistory = [];
     }
   });
 }
@@ -906,7 +946,6 @@ function drawMatrix() {
 window.addEventListener('resize', initMatrix);
 initMatrix();
 setInterval(drawMatrix, 33);
-
 
 /* ==================== 貼心通知 (Toast & Modal) ==================== */
 const toast = document.getElementById('toast');
@@ -1008,8 +1047,6 @@ function getField(item, ...keys) {
 }
 
 /* ==================== 動態雙重連動過濾清單生成 ==================== */
-
-// 當 activeCategory 改變時，計算可用的主題 (Type/Section) 清單
 function getAvailableSections() {
   if (activeCategory === '全部') {
     const sections = new Set();
@@ -1031,7 +1068,6 @@ function getAvailableSections() {
   }
 }
 
-// 當 activeSection 改變時，計算可用的分類 (Category) 清單
 function getAvailableCategories() {
   if (activeSection === '全部') {
     const categories = new Set();
@@ -1052,7 +1088,6 @@ function getAvailableCategories() {
     return ['全部', ...Array.from(categories)];
   }
 }
-
 
 /* ==================== 複製功能 ==================== */
 function copyText(text, btnElement) {
@@ -1158,7 +1193,6 @@ function render() {
   const content = document.getElementById('content');
   const filtered = filterData();
 
-  // 更新上方狀態欄
   document.getElementById('statusType').textContent = activeSection;
   document.getElementById('statusClass').textContent = activeCategory;
   document.getElementById('statusCount').textContent = `${filtered.length} UNITS`;
@@ -1181,7 +1215,7 @@ function render() {
   content.appendChild(grid);
 }
 
-/* ==================== 實時計算在當前選取條件下，按鈕能匹配出的項目數 ==================== */
+/* ==================== 實時計算能匹配出的項目數 ==================== */
 function getCountOfSection(sec) {
   return allData.filter(item => {
     const itemSec = getField(item, '主題', 'type', 'Type', 'section', 'Section', '群組', 'group');
@@ -1204,21 +1238,17 @@ function getCountOfCategory(cat) {
 
 /* ==================== 雙重過濾選單連動渲染的核心控制機制 ==================== */
 function updateFiltersAndRender() {
-  // 1. 取得當前關聯可用的主題清單
   const availableSections = getAvailableSections();
-  // 萬一先前選中的主題不在新的候選名單中，自動回歸「全部」
   if (!availableSections.includes(activeSection)) {
     activeSection = '全部';
   }
 
-  // 2. 取得當前關聯可用的分類清單
   const availableCategories = getAvailableCategories();
-  // 萬一先前選中的分類不在新的候選名單中，自動回歸「全部」
   if (!availableCategories.includes(activeCategory)) {
     activeCategory = '全部';
   }
 
-  // 3. 渲染第一重主題按鈕 (依據 activeCategory 來決定要顯示哪些 Type 按鈕)
+  // 渲染第一重主題按鈕
   const typeRow = document.getElementById('typeRow');
   typeRow.innerHTML = '';
   availableSections.forEach(sec => {
@@ -1235,7 +1265,7 @@ function updateFiltersAndRender() {
     typeRow.appendChild(btn);
   });
 
-  // 4. 渲染第二重分類按鈕 (依據 activeSection 來決定要顯示哪些 Category 按鈕)
+  // 渲染第二重分類按鈕
   const categoryRow = document.getElementById('categoryRow');
   categoryRow.innerHTML = '';
   availableCategories.forEach(cat => {
@@ -1252,7 +1282,6 @@ function updateFiltersAndRender() {
     categoryRow.appendChild(btn);
   });
 
-  // 5. 輸出符合雙重條件的提示詞卡片
   render();
 }
 
@@ -1271,8 +1300,6 @@ async function init() {
   }
 
   allData = data;
-
-  // 使用連動控制機制進行初始渲染
   updateFiltersAndRender();
 }
 
@@ -1287,7 +1314,7 @@ searchInput.addEventListener('input', function() {
   } else {
     clearSearch.style.display = 'none';
   }
-  render(); // 搜尋不主動隱藏分類按鈕，維持按鈕資料完整性，僅針對下方的網格做實時文字快篩
+  render();
 });
 
 clearSearch.addEventListener('click', function() {
