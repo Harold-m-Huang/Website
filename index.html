@@ -36,20 +36,20 @@
     position: relative;
   }
 
-  /* 科技掃描線效果 */
+  /* 科技掃描線效果 (最上層疊加) */
   body::before {
     content: " ";
     display: block;
     position: fixed;
     top: 0; left: 0; bottom: 0; right: 0;
-    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 255, 0, 0.06));
     z-index: 9999;
     background-size: 100% 4px, 6px 100%;
     pointer-events: none;
     opacity: 0.4;
   }
 
-  /* Matrix 數位雨 Canvas 背景 */
+  /* Matrix 背景數位雨 Canvas (在內容後方) */
   #matrix-bg {
     position: fixed;
     top: 0;
@@ -57,8 +57,19 @@
     width: 100%;
     height: 100%;
     z-index: -1;
-    opacity: 0.12; /* 微弱動態感，不干擾文字閱讀 */
+    opacity: 0.15;
     pointer-events: none;
+  }
+
+  /* Matrix 前景黃金雨 Canvas (在內容前方，穿透所有元件) */
+  #matrix-fg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9998; /* 低於掃描線的 9999，但高於一切主要內容 */
+    pointer-events: none; /* 極重要：穿透滑鼠事件，讓下方的按鈕、文字仍能被點擊選取 */
   }
 
   /* 網格網線背景 */
@@ -77,7 +88,7 @@
     padding: 70px 24px 20px;
     text-align: center;
     position: relative;
-    max-width: 900px;
+    max-width: 1000px;
     margin: 0 auto;
   }
 
@@ -146,7 +157,7 @@
   }
   .sheet-link svg { width: 14px; height: 14px; }
 
-  /* 搜尋區塊外框優化 */
+  /* 搜尋區塊外框 */
   .search-container {
     max-width: 580px;
     margin: 0 auto 36px;
@@ -221,56 +232,89 @@
   .clear-btn:hover { color: var(--matrix-green); }
   .clear-btn svg { width: 18px; height: 18px; }
 
-  /* 橫向滾動分類列：微調科技刻度感 */
-  .category-outer {
-    max-width: 960px;
-    margin: 0 auto 40px;
-    padding: 0 24px;
-    position: relative;
+  /* 雙重選單面板 (Console Dashboard) */
+  .filter-panel {
+    max-width: 1000px;
+    margin: 0 auto 32px;
+    background: rgba(7, 10, 14, 0.6);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 20px;
+    text-align: left;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
   }
-  
-  .category-row {
+
+  .filter-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 12px 0;
+  }
+
+  .filter-row:not(:last-child) {
+    border-bottom: 1px dashed rgba(0, 255, 102, 0.1);
+  }
+
+  .filter-label {
+    font-family: 'Fira Code', monospace;
+    font-size: 12px;
+    font-weight: bold;
+    color: var(--matrix-cyan);
+    min-width: 130px;
+    padding-top: 8px;
+    letter-spacing: 1px;
+    text-shadow: 0 0 5px rgba(0, 240, 255, 0.3);
+  }
+
+  .filter-buttons {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    justify-content: center;
   }
 
   .cat-btn {
-    padding: 8px 18px;
+    padding: 6px 14px;
     border-radius: 4px;
-    font-size: 13px;
+    font-size: 12.5px;
     font-family: inherit;
     font-weight: 500;
     border: 1px solid var(--border-color);
-    background: var(--bg-card);
+    background: var(--bg-input);
     color: var(--text-secondary);
     cursor: pointer;
     transition: all 0.2s ease;
-    position: relative;
-    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
   }
-  .cat-btn::before {
-    content: '';
-    position: absolute;
-    left: 0; top: 0; width: 3px; height: 100%;
-    background: var(--matrix-green);
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
+
   .cat-btn:hover {
     border-color: var(--matrix-green-dim);
     color: var(--matrix-green);
     background: rgba(0, 255, 102, 0.02);
   }
+
   .cat-btn.active {
     background: var(--matrix-green-glow);
     border-color: var(--matrix-green);
     color: var(--matrix-green);
-    box-shadow: 0 0 12px rgba(0, 255, 102, 0.1);
+    box-shadow: 0 0 10px rgba(0, 255, 102, 0.15);
   }
-  .cat-btn.active::before {
-    opacity: 1;
+
+  .btn-count {
+    font-family: 'Fira Code', monospace;
+    font-size: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: var(--text-muted);
+    transition: all 0.2s;
+  }
+
+  .cat-btn.active .btn-count {
+    background: rgba(0, 255, 102, 0.2);
+    color: var(--matrix-green);
   }
 
   .main {
@@ -280,32 +324,22 @@
     position: relative;
   }
 
-  .section {
-    margin-bottom: 56px;
+  /* 顯示當前過濾狀態 */
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    font-family: 'Fira Code', monospace;
+    font-size: 13px;
+    color: var(--text-secondary);
+    border-bottom: 1.5px solid var(--border-color);
+    padding-bottom: 10px;
   }
 
-  .section-title {
-    font-family: 'Fira Code', monospace;
-    font-size: 1.15rem;
-    font-weight: 600;
-    color: #FFFFFF;
-    margin-bottom: 28px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 12px;
-    position: relative;
-  }
-  .section-title::after {
-    content: '';
-    position: absolute;
-    bottom: -1px;
-    left: 0;
-    width: 60px;
-    height: 2px;
-    background: var(--matrix-green);
-    box-shadow: 0 0 8px var(--matrix-green);
+  .status-info span {
+    color: var(--matrix-green);
+    font-weight: bold;
   }
 
   .card-grid {
@@ -314,10 +348,10 @@
     gap: 24px;
   }
 
-  /* 科技卡片樣式升級 */
+  /* 科技卡片樣式 */
   .prompt-card {
     background: var(--bg-card);
-    border-radius: 4px; /* 更方正硬朗的科幻棱角 */
+    border-radius: 4px;
     border: 1.5px solid var(--border-color);
     padding: 24px;
     display: flex;
@@ -328,7 +362,7 @@
     overflow: hidden;
   }
   
-  /* 卡片裝飾：左上與右下的微細高亮點 */
+  /* 卡片裝飾：右上角微型高亮角 */
   .prompt-card::after {
     content: '';
     position: absolute;
@@ -352,7 +386,7 @@
   .card-header-row {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
     gap: 10px;
   }
 
@@ -362,19 +396,19 @@
     border-radius: 3px;
     font-size: 11px;
     font-weight: 600;
-    width: fit-content;
     text-transform: uppercase;
     font-family: 'Fira Code', monospace;
   }
 
-  /* 擴充閱讀/收折標記 */
-  .expand-indicator {
+  .card-sec-badge {
+    font-family: 'Fira Code', monospace;
     font-size: 11px;
-    color: var(--text-muted);
-    cursor: pointer;
-    transition: color 0.2s;
+    color: var(--matrix-cyan);
+    background: rgba(0, 240, 255, 0.06);
+    border: 1px solid rgba(0, 240, 255, 0.2);
+    padding: 2px 8px;
+    border-radius: 3px;
   }
-  .expand-indicator:hover { color: var(--matrix-green); }
 
   .card-title {
     font-size: 1.15rem;
@@ -384,7 +418,6 @@
     letter-spacing: 0.5px;
   }
 
-  /* 限制高度並提供局部滾動或點擊展開 */
   .card-body-wrapper {
     position: relative;
     flex: 1;
@@ -514,7 +547,7 @@
     border: 1px solid rgba(0, 255, 102, 0.2);
   }
 
-  /* Matrix 風格分類標籤顏色：增加微發光感與邊框色差 */
+  /* Matrix 風格分類標籤顏色 */
   .tag-content  { background: rgba(0, 255, 102, 0.08); color: #00FF66; border: 1px solid rgba(0, 255, 102, 0.3); }
   .tag-note     { background: rgba(56, 189, 248, 0.08); color: #38BDF8; border: 1px solid rgba(56, 189, 248, 0.3); }
   .tag-code     { background: rgba(34, 197, 94, 0.08);  color: #4ADE80; border: 1px solid rgba(34, 197, 94, 0.3); }
@@ -636,8 +669,9 @@
 </head>
 <body>
 
-<!-- 數位背景 Canvas -->
+<!-- 數位背景與前景 Canvas -->
 <canvas id="matrix-bg"></canvas>
+<canvas id="matrix-fg"></canvas>
 <div class="grid-overlay"></div>
 
 <div class="top-bar">
@@ -655,6 +689,7 @@
     ACCESS_SOURCE_GOOGLE_SHEET ↗
   </a>
 
+  <!-- 搜尋控制台 -->
   <div class="search-container">
     <div class="search-wrap">
       <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -665,14 +700,36 @@
     </div>
   </div>
 
-  <div class="category-outer">
-    <div class="category-row" id="categoryRow">
-      <!-- 分類按鈕動態載入 -->
+  <!-- 雙重過濾主控制面板 (Dual Filtering Panel) -->
+  <div class="filter-panel">
+    <!-- 第一重：Type/主題 -->
+    <div class="filter-row">
+      <div class="filter-label">[SELECT_TYPE] :</div>
+      <div class="filter-buttons" id="typeRow">
+        <!-- 主題選單動態載入 -->
+      </div>
+    </div>
+    <!-- 第二重：分類/Category -->
+    <div class="filter-row">
+      <div class="filter-label">[SELECT_CLASS]:</div>
+      <div class="filter-buttons" id="categoryRow">
+        <!-- 分類選單動態載入 -->
+      </div>
     </div>
   </div>
 </div>
 
 <div class="main">
+  <!-- 狀態欄：顯示目前篩選結果統計 -->
+  <div class="status-bar">
+    <div class="status-info">
+      SYS_STATUS: ACTIVE_TYPE[<span id="statusType">全部</span>] // ACTIVE_CLASS[<span id="statusClass">全部</span>]
+    </div>
+    <div>
+      FOUND_DEVICES: <span id="statusCount" style="color:var(--matrix-green); font-weight:bold;">0</span>
+    </div>
+  </div>
+
   <div id="content">
     <div class="loading">
       <div class="terminal-loader"></div>
@@ -722,20 +779,16 @@ const TAG_CLASS_MAP = {
   '心智圖法': 'tag-mind',
 };
 
-const SECTION_EMOJI = {
-  'AI 協思': '🧠',
-  '學習研究': '📚',
-  '工作效率': '💼',
-  '創意寫作': '✍️',
-};
-
 let allData = [];
-let activeCategory = '全部';
+let activeSection = '全部';  // 第一重選單：主題 / Type
+let activeCategory = '全部'; // 第二重選單：分類 / Category
 let searchQuery = '';
 
-/* ==================== Background Matrix Digital Rain ==================== */
-const canvas = document.getElementById('matrix-bg');
-const ctx = canvas.getContext('2d');
+/* ==================== Background & Foreground Matrix Digital Rain ==================== */
+const canvasBg = document.getElementById('matrix-bg');
+const ctxBg = canvasBg.getContext('2d');
+const canvasFg = document.getElementById('matrix-fg');
+const ctxFg = canvasFg.getContext('2d');
 
 let columns = [];
 const fontSize = 14;
@@ -749,35 +802,103 @@ const katakana = 'アイウエオカキクケコサシスセソタチツテト�
 const charPool = zhuyin + english + numbers + hiragana + katakana;
 
 function initMatrix() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  const colCount = Math.floor(canvas.width / fontSize) + 1;
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  
+  canvasBg.width = w;
+  canvasBg.height = h;
+  canvasFg.width = w;
+  canvasFg.height = h;
+  
+  const colCount = Math.floor(w / fontSize) + 1;
   columns = [];
   for (let i = 0; i < colCount; i++) {
     columns.push({
       x: i * fontSize,
-      y: Math.random() * -canvas.height,
-      speed: 0.5 + Math.random() * 8.5 // 速度差異加大：最慢 0.5 到最快 9.0，大幅提升景深感
+      y: Math.random() * -h,
+      speed: 0.5 + Math.random() * 8.5, // 速度差異
+      opacity: 0.15 + Math.random() * 0.85, // 隨機綠色雨滴明暗度
+      isGolden: false, // 是否為特殊黃金雨滴
+      goldHistory: [] // 用於儲存前景黃金雨滴的歷史殘影軌跡
     });
   }
 }
 
+// 追蹤上一次產生黃金雨滴的時間
+let lastGoldTime = Date.now();
+// 隨機產生下一次黃金雨滴出現的冷卻間隔 (3000 ~ 5000 毫秒)
+let goldInterval = 3000 + Math.random() * 2000;
+
 function drawMatrix() {
-  ctx.fillStyle = 'rgba(2, 2, 4, 0.1)';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  
-  ctx.fillStyle = '#00ff66';
-  ctx.font = fontSize + 'px monospace';
+  // 1. 清除背景 Canvas，用帶有尾跡深度的 semi-transparent 黑色填滿
+  ctxBg.fillStyle = 'rgba(2, 2, 4, 0.14)';
+  ctxBg.fillRect(0, 0, canvasBg.width, canvasBg.height);
+
+  // 2. 徹底清除前景 Canvas（因為前景完全透明，不能用填滿黑色的方式產生殘影）
+  ctxFg.clearRect(0, 0, canvasFg.width, canvasFg.height);
+
+  // 3. 定期觸發前景黃金雨滴產生機制
+  if (Date.now() - lastGoldTime > goldInterval) {
+    const randomCol = columns[Math.floor(Math.random() * columns.length)];
+    if (randomCol && !randomCol.isGolden) {
+      randomCol.isGolden = true;
+      randomCol.speed = 4.5 + Math.random() * 3.5; // 黃金雨滴的速度稍微快且穩定一些
+      randomCol.y = -80; // 從頂部更上方起跑
+      randomCol.goldHistory = []; // 初始化軌跡紀錄
+    }
+    lastGoldTime = Date.now();
+    // 每次觸發後重新隨機決定下一次的冷卻間隔 (3 到 5 秒)
+    goldInterval = 3000 + Math.random() * 2000;
+  }
   
   columns.forEach(col => {
-    // 從自訂混合池中隨機抽選字元
     const text = charPool[Math.floor(Math.random() * charPool.length)];
-    ctx.fillText(text, col.x, col.y);
-    
+
+    if (col.isGolden) {
+      // ===== 前景黃金雨滴渲染機制 =====
+      // 記錄此影格的位置與隨機字元
+      col.goldHistory.push({ y: col.y, char: text });
+      
+      // 限制軌跡長度，長度 10 代表後面會有漂亮的手動漸暗光跡
+      if (col.goldHistory.length > 10) {
+        col.goldHistory.shift();
+      }
+
+      ctxFg.font = fontSize + 'px monospace';
+      col.goldHistory.forEach((historyItem, index) => {
+        // 光跡尾端最暗，最前方（頭部）完全不透明清晰
+        const alpha = (index + 1) / col.goldHistory.length;
+        ctxFg.fillStyle = `rgba(255, 215, 0, ${alpha})`;
+
+        // 只讓最前方（最後加入陣列）的雨滴頭部具有霓虹外發光，防止整條光跡太刺眼
+        if (index === col.goldHistory.length - 1) {
+          ctxFg.shadowBlur = 15;
+          ctxFg.shadowColor = '#FFE700';
+        } else {
+          ctxFg.shadowBlur = 0;
+        }
+        ctxFg.fillText(historyItem.char, col.x, historyItem.y);
+      });
+      // 重置發光設定，避免影響其他前景繪製
+      ctxFg.shadowBlur = 0;
+
+    } else {
+      // ===== 背景綠色雨滴渲染機制 =====
+      ctxBg.font = fontSize + 'px monospace';
+      ctxBg.fillStyle = `rgba(0, 255, 102, ${col.opacity})`;
+      ctxBg.fillText(text, col.x, col.y);
+    }
+
+    // 更新垂直下墬位置
     col.y += col.speed;
-    if (col.y > canvas.height) {
+
+    // 當雨滴超過畫布底部，重置回最上方並還原狀態
+    if (col.y > canvasBg.height) {
       col.y = -50;
-      col.speed = 0.5 + Math.random() * 8.5; // 重設雨滴落下速度
+      col.speed = 0.5 + Math.random() * 8.5;
+      col.opacity = 0.15 + Math.random() * 0.85;
+      col.isGolden = false;
+      col.goldHistory = []; // 清空殘影
     }
   });
 }
@@ -798,7 +919,6 @@ function showToast(msg) {
   }, 2500);
 }
 
-// 彈出視窗事件處理
 const modal = document.getElementById('promptModal');
 const modalBody = document.getElementById('modalBody');
 const modalCopyBtn = document.getElementById('modalCopyBtn');
@@ -880,25 +1000,6 @@ async function loadData() {
   }
 }
 
-function buildCategories(data) {
-  const cats = new Set();
-  data.forEach(item => {
-    const cat = item['分類'] || item['category'] || item['Category'] || item['類別'] || '';
-    if (cat) cats.add(cat);
-  });
-  return ['全部', ...Array.from(cats)];
-}
-
-function groupBySection(data) {
-  const sections = {};
-  data.forEach(item => {
-    const sec = item['主題'] || item['section'] || item['Section'] || item['群組'] || item['group'] || 'AI 協思';
-    if (!sections[sec]) sections[sec] = [];
-    sections[sec].push(item);
-  });
-  return sections;
-}
-
 function getField(item, ...keys) {
   for (const k of keys) {
     if (item[k] !== undefined && item[k] !== '') return item[k];
@@ -906,9 +1007,55 @@ function getField(item, ...keys) {
   return '';
 }
 
-/* ==================== 複製功能優化 ==================== */
+/* ==================== 動態雙重連動過濾清單生成 ==================== */
+
+// 當 activeCategory 改變時，計算可用的主題 (Type/Section) 清單
+function getAvailableSections() {
+  if (activeCategory === '全部') {
+    const sections = new Set();
+    allData.forEach(item => {
+      const sec = getField(item, '主題', 'type', 'Type', 'section', 'Section', '群組', 'group');
+      if (sec && sec.trim()) sections.add(sec.trim());
+    });
+    return ['全部', ...Array.from(sections)];
+  } else {
+    const sections = new Set();
+    allData.forEach(item => {
+      const cat = getField(item, '分類', 'category', 'Category', '類別');
+      if (cat === activeCategory) {
+        const sec = getField(item, '主題', 'type', 'Type', 'section', 'Section', '群組', 'group');
+        if (sec && sec.trim()) sections.add(sec.trim());
+      }
+    });
+    return ['全部', ...Array.from(sections)];
+  }
+}
+
+// 當 activeSection 改變時，計算可用的分類 (Category) 清單
+function getAvailableCategories() {
+  if (activeSection === '全部') {
+    const categories = new Set();
+    allData.forEach(item => {
+      const cat = getField(item, '分類', 'category', 'Category', '類別');
+      if (cat && cat.trim()) categories.add(cat.trim());
+    });
+    return ['全部', ...Array.from(categories)];
+  } else {
+    const categories = new Set();
+    allData.forEach(item => {
+      const sec = getField(item, '主題', 'type', 'Type', 'section', 'Section', '群組', 'group');
+      if (sec === activeSection) {
+        const cat = getField(item, '分類', 'category', 'Category', '類別');
+        if (cat && cat.trim()) categories.add(cat.trim());
+      }
+    });
+    return ['全部', ...Array.from(categories)];
+  }
+}
+
+
+/* ==================== 複製功能 ==================== */
 function copyText(text, btnElement) {
-  // 利用 iFrame 相容方案與原生 Clipboard 整合
   const fallbackCopy = (txt) => {
     const ta = document.createElement('textarea');
     ta.value = txt;
@@ -950,6 +1097,7 @@ function renderCard(item) {
   const title = getField(item, '標題', 'title', 'Title', '名稱');
   const prompt = getField(item, 'Prompt', 'prompt', '提示詞', '內容', 'content');
   const cat = getField(item, '分類', 'category', 'Category', '類別');
+  const sec = getField(item, '主題', 'type', 'Type', 'section', 'Section', '群組', 'group') || '預設';
   const tagClass = getTagClass(cat);
 
   const card = document.createElement('div');
@@ -961,6 +1109,7 @@ function renderCard(item) {
   card.innerHTML = `
     <div class="card-header-row">
       ${cat ? `<span class="card-tag ${tagClass}">${cat}</span>` : '<span></span>'}
+      <span class="card-sec-badge">${sec}</span>
     </div>
     ${title ? `<div class="card-title">${title}</div>` : ''}
     <div class="card-body-wrapper">
@@ -972,14 +1121,12 @@ function renderCard(item) {
     </div>
   `;
 
-  // 複製按鈕綁定
   card.querySelector('.copy-btn').addEventListener('click', function(e) {
     e.stopPropagation();
     const text = this.getAttribute('data-prompt');
     copyText(text, this);
   });
 
-  // 檢視按鈕綁定
   card.querySelector('.view-btn').addEventListener('click', function(e) {
     e.stopPropagation();
     openModal(title || 'PROMPT_DETAIL', prompt);
@@ -988,51 +1135,125 @@ function renderCard(item) {
   return card;
 }
 
+/* ==================== 雙重過濾 ==================== */
 function filterData() {
   return allData.filter(item => {
     const cat = getField(item, '分類', 'category', 'Category', '類別');
+    const sec = getField(item, '主題', 'type', 'Type', 'section', 'Section', '群組', 'group');
     const title = getField(item, '標題', 'title', 'Title', '名稱').toLowerCase();
     const prompt = getField(item, 'Prompt', 'prompt', '提示詞', '內容', 'content').toLowerCase();
+
+    const matchSec = activeSection === '全部' || sec === activeSection;
     const matchCat = activeCategory === '全部' || cat === activeCategory;
+
     const q = searchQuery.toLowerCase();
-    const matchSearch = !q || title.includes(q) || prompt.includes(q) || cat.toLowerCase().includes(q);
-    return matchCat && matchSearch;
+    const matchSearch = !q || title.includes(q) || prompt.includes(q) || cat.toLowerCase().includes(q) || sec.toLowerCase().includes(q);
+
+    return matchSec && matchCat && matchSearch;
   });
 }
 
+/* ==================== 渲染畫面 ==================== */
 function render() {
   const content = document.getElementById('content');
   const filtered = filterData();
+
+  // 更新上方狀態欄
+  document.getElementById('statusType').textContent = activeSection;
+  document.getElementById('statusClass').textContent = activeCategory;
+  document.getElementById('statusCount').textContent = `${filtered.length} UNITS`;
 
   if (filtered.length === 0) {
     content.innerHTML = `
       <div class="empty">
         ⚠️ ERROR: NO_MATCHING_PROMPT_FOUND 
-        <br><span style="font-size: 12px; margin-top: 8px; display: inline-block; color: var(--text-secondary);">請重新搜尋其他關鍵字或變更分類。</span>
+        <br><span style="font-size: 12px; margin-top: 8px; display: inline-block; color: var(--text-secondary);">請重新調整雙重選單或搜尋關鍵字。</span>
       </div>`;
     return;
   }
 
-  const sections = groupBySection(filtered);
   content.innerHTML = '';
+  
+  const grid = document.createElement('div');
+  grid.className = 'card-grid';
+  
+  filtered.forEach(item => grid.appendChild(renderCard(item)));
+  content.appendChild(grid);
+}
 
-  Object.entries(sections).forEach(([sec, items]) => {
-    const secEl = document.createElement('div');
-    secEl.className = 'section';
+/* ==================== 實時計算在當前選取條件下，按鈕能匹配出的項目數 ==================== */
+function getCountOfSection(sec) {
+  return allData.filter(item => {
+    const itemSec = getField(item, '主題', 'type', 'Type', 'section', 'Section', '群組', 'group');
+    const itemCat = getField(item, '分類', 'category', 'Category', '類別');
+    const matchSec = sec === '全部' || itemSec === sec;
+    const matchCat = activeCategory === '全部' || itemCat === activeCategory;
+    return matchSec && matchCat;
+  }).length;
+}
 
-    const emoji = SECTION_EMOJI[sec] || '📡';
-    secEl.innerHTML = `
-      <div class="section-title">
-        <span>${emoji} ${sec}</span>
-        <span class="count-badge">${items.length} DEVICES</span>
-      </div>
-      <div class="card-grid"></div>
-    `;
+function getCountOfCategory(cat) {
+  return allData.filter(item => {
+    const itemSec = getField(item, '主題', 'type', 'Type', 'section', 'Section', '群組', 'group');
+    const itemCat = getField(item, '分類', 'category', 'Category', '類別');
+    const matchSec = activeSection === '全部' || itemSec === activeSection;
+    const matchCat = cat === '全部' || itemCat === cat;
+    return matchSec && matchCat;
+  }).length;
+}
 
-    const grid = secEl.querySelector('.card-grid');
-    items.forEach(item => grid.appendChild(renderCard(item)));
-    content.appendChild(secEl);
+/* ==================== 雙重過濾選單連動渲染的核心控制機制 ==================== */
+function updateFiltersAndRender() {
+  // 1. 取得當前關聯可用的主題清單
+  const availableSections = getAvailableSections();
+  // 萬一先前選中的主題不在新的候選名單中，自動回歸「全部」
+  if (!availableSections.includes(activeSection)) {
+    activeSection = '全部';
+  }
+
+  // 2. 取得當前關聯可用的分類清單
+  const availableCategories = getAvailableCategories();
+  // 萬一先前選中的分類不在新的候選名單中，自動回歸「全部」
+  if (!availableCategories.includes(activeCategory)) {
+    activeCategory = '全部';
+  }
+
+  // 3. 渲染第一重主題按鈕 (依據 activeCategory 來決定要顯示哪些 Type 按鈕)
+  const typeRow = document.getElementById('typeRow');
+  typeRow.innerHTML = '';
+  availableSections.forEach(sec => {
+    const btn = document.createElement('button');
+    btn.className = 'cat-btn' + (sec === activeSection ? ' active' : '');
+    
+    const count = getCountOfSection(sec);
+    btn.innerHTML = `${sec} <span class="btn-count">${count}</span>`;
+    
+    btn.addEventListener('click', () => {
+      activeSection = sec;
+      updateFiltersAndRender();
+    });
+    typeRow.appendChild(btn);
   });
+
+  // 4. 渲染第二重分類按鈕 (依據 activeSection 來決定要顯示哪些 Category 按鈕)
+  const categoryRow = document.getElementById('categoryRow');
+  categoryRow.innerHTML = '';
+  availableCategories.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'cat-btn' + (cat === activeCategory ? ' active' : '');
+    
+    const count = getCountOfCategory(cat);
+    btn.innerHTML = `${cat} <span class="btn-count">${count}</span>`;
+    
+    btn.addEventListener('click', () => {
+      activeCategory = cat;
+      updateFiltersAndRender();
+    });
+    categoryRow.appendChild(btn);
+  });
+
+  // 5. 輸出符合雙重條件的提示詞卡片
+  render();
 }
 
 /* ==================== 頁面初始控制 ==================== */
@@ -1051,24 +1272,8 @@ async function init() {
 
   allData = data;
 
-  const cats = buildCategories(data);
-  const catRow = document.getElementById('categoryRow');
-  catRow.innerHTML = '';
-  cats.forEach(cat => {
-    const btn = document.createElement('button');
-    btn.className = 'cat-btn' + (cat === '全部' ? ' active' : '');
-    btn.dataset.cat = cat;
-    btn.textContent = cat;
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      activeCategory = cat;
-      render();
-    });
-    catRow.appendChild(btn);
-  });
-
-  render();
+  // 使用連動控制機制進行初始渲染
+  updateFiltersAndRender();
 }
 
 /* ==================== 搜尋輸入交互處理 ==================== */
@@ -1082,7 +1287,7 @@ searchInput.addEventListener('input', function() {
   } else {
     clearSearch.style.display = 'none';
   }
-  render();
+  render(); // 搜尋不主動隱藏分類按鈕，維持按鈕資料完整性，僅針對下方的網格做實時文字快篩
 });
 
 clearSearch.addEventListener('click', function() {
